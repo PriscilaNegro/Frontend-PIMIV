@@ -1,0 +1,76 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 3;
+  padding: 30px;
+  background-color: #fff;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.header .logo {
+  height: 50px; /* ajuste conforme o tamanho da logo */
+}
+
+.chamado-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.info-left p, .info-right p {
+  margin: 5px 0;
+}
+
+.descricao, .solucao {
+  background-color: #e2e2e2;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.descricao h2, .solucao h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.sidebar {
+  flex: 1;
+  background: linear-gradient(to bottom, #0f3c6b, #061f3a);
+  color: #fff;
+  padding: 20px;
+}
+
+.sidebar p {
+  margin: 10px 0 5px;
+}
+
+.sidebar span {
+  display: block;
+  background-color: #a0b7d1;
+  color: #000;
+  padding: 8px;
+  border-radius: 20px;
+  text-align: center;
+  margin-bottom: 15px;
+}

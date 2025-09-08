@@ -1,0 +1,40 @@
+body {
+  margin: 0;
+  height: 100vh;
+  background: linear-gradient(135deg, #003366, #0055a5); /* Azul degradê */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  font-size: 8rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+p {
+  font-size: 2rem;
+}
+
+.btn-chamado {
+  background-color: #ffffff;
+  color: #003366;
+  font-weight: 600;
+  border-radius: 25px;
+  padding: 12px 25px;
+  transition: 0.3s ease;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  text-decoration: none;
+}
+
+.btn-chamado:hover {
+  background-color: #003366;
+  color: #fff;
+  border: 1px solid #fff;
+}
