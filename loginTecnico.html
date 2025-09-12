@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4Devs - Área do Técnico</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="main-container">
+   
+    <div class="left-side">
+      <img src="img/logo.png" alt="Las Preguntitas" class="logo">
+    </div>
+
+    <div class="right-side">
+      <div class="content-container">
+        <h1>Olá, Técnico!</h1>
+        <h2>Faça login para acessar o painel de chamados</h2>
+        
+        <form id="form-login">
+          <label for="email">E-mail</label>
+          <input 
+            type="text" 
+            id="usuario" 
+            placeholder="Digite seu e-mail" 
+            required>
+
+          <label for="senha">Senha</label>
+          <input 
+            type="password" 
+            id="senha" 
+            placeholder="Digite sua senha" 
+            required>
+
+          <button type="submit">Entrar</button>
+          <p id="erro-login" style="color:red; display:none;"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Exemplo simples de validação
+    const formLogin = document.getElementById('form-login');
+    formLogin.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const usuario = document.getElementById('usuario').value;
+      const senha = document.getElementById('senha').value;
+      
+      if(usuario === 'tecnico' && senha === '123456') {
+        alert('Login realizado com sucesso!');
+        // Aqui você pode redirecionar para a área do técnico
+        // window.location.href = 'painel-tecnico.html';
+      } else {
+        const erro = document.getElementById('erro-login');
+        erro.style.display = 'block';
+        erro.textContent = 'Usuário ou senha incorretos!';
+      }
+    });
+  </script>
+</body>
+</html>

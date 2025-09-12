@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tela Inicial</title>
+  <title>4Devs - Área do cliente</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,15 +17,24 @@
       <div class="content-container">
         <h1>Olá, cliente!</h1>
         <h2>Bem-vindo a página de suporte técnico da 4Devs</h2>
-        <form>
-          <label for="chamado">Consulte o seu chamado 🔍</label>
-          <input type="text" id="chamado" placeholder="Cód #">
+        <form id="form-chamado">
+         <label for="chamado">Consulte o seu chamado 🔍</label>
+          <input 
+            type="text" 
+            id="chamado" 
+            placeholder="Ex: 42516" 
+            maxlength="6">
+            <button type="submit">Consultar</button>
+            <p id="erro" style="color:red; display:none;"></p>
         </form>
+
+
         <p class="ou">OU</p>
         <p>Se estiver com problemas:<br>Converse com a Steph, nossa assistente virtual 🤖</p>
         <button>Iniciar Conversa</button>
       </div>
     </div>
   </div>
+ <script src="script.js"></script>
 </body>
 </html>
