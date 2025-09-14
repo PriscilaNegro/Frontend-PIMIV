@@ -1,0 +1,236 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.main-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.left-side {
+  flex: 0.4;
+  background: linear-gradient(to bottom, #001f3f, #003366);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  max-width: 70%;
+  height: auto;
+}
+
+.right-side {
+  flex: 0.6;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content-container {
+  width: 80%;
+  max-width: 350px;
+  text-align: center;
+}
+
+.content-container h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.content-container h2 {
+  font-size: 1.2rem;
+  font-weight: normal;
+  margin-bottom: 1rem;
+}
+
+.content-container input {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: box-shadow 0.3s;
+}
+
+.content-container input:focus {
+  box-shadow: 0 0 5px rgba(0,102,204,0.5);
+  outline: none;
+}
+
+.content-container button {
+  padding: 0.7rem 1.5rem;
+  background-color: #00264d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.content-container button:hover {
+  background-color: #001f3f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.content-container form label {
+  display: block;
+  text-align: left;
+  margin-top: 0.5rem;
+}
+
+.esqueci-senha {
+  display: block;
+  text-align: right;
+  font-size: 0.9rem;
+  color: #00264d;
+  text-decoration: none;
+  margin-top: 0.3rem;
+}
+
+.esqueci-senha:hover {
+  text-decoration: underline;
+  color: #001f3f;
+}
+
+#erro-login {
+  color: red;
+  display: none;
+  margin-top: 0.5rem;
+}
+
+/* Modal fundo */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Caixa do modal */
+.modal-content {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 350px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  font-family: Arial, sans-serif;
+}
+
+.modal-content h2 {
+  margin-bottom: 1rem;
+  color: #00264d;
+  font-size: 1.3rem;
+}
+
+.modal-content p {
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 0.5rem;
+  margin: 0.5rem 0 1rem 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.modal-content button {
+  padding: 0.7rem 1.5rem;
+  background-color: #00264d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.modal-content button:hover {
+  background-color: #001f3f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Botão fechar (X) */
+.fechar {
+  float: right;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+}
+
+.msg-recuperar {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  display: none;
+  padding: 0.6rem;
+  border-radius: 5px;
+}
+
+.msg-recuperar.sucesso {
+  display: block;
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.msg-recuperar.erro {
+  display: block;
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.btn-ok {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #00264d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.btn-ok:hover {
+  background-color: #001f3f;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+  }
+
+  .left-side {
+    flex: none;
+    height: 150px;
+  }
+
+  .right-side {
+    flex: none;
+    padding: 1rem;
+  }
+}
