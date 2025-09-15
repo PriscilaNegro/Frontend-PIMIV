@@ -8,7 +8,6 @@
 </head>
 <body>
   <div class="main-container">
-   
     <div class="left-side">
       <img src="img/logo.png" alt="Las Preguntitas" class="logo">
     </div>
@@ -16,25 +15,29 @@
     <div class="right-side">
       <div class="content-container">
         <h1>Olá, cliente!</h1>
-        <h2>Bem-vindo a página de suporte técnico da 4Devs</h2>
+        <h2>Bem-vindo à página de suporte técnico da 4Devs</h2>
+
         <form id="form-chamado">
-         <label for="chamado">Consulte o seu chamado 🔍</label>
+          <label for="chamado">Consulte o seu chamado 🔍</label>
           <input 
             type="text" 
             id="chamado" 
             placeholder="Ex: 42516" 
             maxlength="6">
-            <button type="submit">Consultar</button>
-            <p id="erro" style="color:red; display:none;"></p>
+          <button type="submit">Consultar</button>
+          <p id="erro" style="color:red; display:none;"></p>
         </form>
 
+        <p>Se estiver com problemas, acesse nossa página de dúvidas frenquentes</p>
+        <a href="faq.html" class="btn-faq">❓FAQ </a>
 
         <p class="ou">OU</p>
-        <p>Se estiver com problemas:<br>Converse com a Steph, nossa assistente virtual 🤖</p>
-        <button>Iniciar Conversa</button>
+
+        <p>Converse com a Steph, nossa assistente virtual 🤖</p>
+        <button class="iniciar-chat">Iniciar Conversa</button>
       </div>
     </div>
   </div>
- <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
