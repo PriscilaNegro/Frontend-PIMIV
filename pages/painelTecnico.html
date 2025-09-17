@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Chamados - Técnico</title>
+  <link rel="stylesheet" href="../assets/css/painelTecnico.css">
+</head>
+<body>
+  <div class="container">
+    <!-- MENU LATERAL -->
+    <aside class="sidebar">
+      <div class="profile">
+        <img src="avatar.png" alt="Avatar Técnico">
+        <p>Patrícia</p>
+      </div>
+      <nav>
+        <ul>
+          <li id="agendaBtn">📅 Agenda</li>
+          <li><a href="relatorios.html">📊 Relatórios</a></li>  <!--Página futura-->
+          <li id="adminBtn">🛠️ Admin Console</li>
+        </ul>
+      </nav>
+      <div class="logout">⇦ Sair</div>
+    </aside>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="main">
+      <!-- Barra superior -->
+      <header class="topbar">
+        <input type="text" placeholder="Pesquisa de Chamados">
+        <button class="new-call">+ Novo Chamado</button>
+      </header>
+
+      <!-- Filtros -->
+      <div class="filters">
+        <button>Status</button>
+        <button>Prioridade</button>
+        <button>Responsável</button>
+      </div>
+
+      <!-- Lista de chamados -->
+      <section class="calls">
+        <div class="call-card">
+          <p><strong>Cód: #1235</strong> - Problema Office</p>
+          <p>João Pedro - 06/07/2025 15:30</p>
+          <span class="priority baixa">Baixa</span>
+          <span class="status aberto">Aberto</span>
+        </div>
+
+        <div class="call-card">
+          <p><strong>Cód: #3333</strong> - Sem conexão com a Internet</p>
+          <p>João Pedro - 06/07/2025 15:30</p>
+          <span class="priority alta">Alta</span>
+          <span class="status andamento">Em andamento</span>
+        </div>
+      </section>
+    </main>
+
+    <!-- PAINEL DIREITO -->
+    <aside class="status-panel">
+      <h3>Status</h3>
+      <div class="chart">[ Gráfico de Pizza Aqui ]</div>
+      <div class="response-time">
+        <h4>Tempo Médio de Resposta</h4>
+        <p><strong>3 horas</strong></p>
+      </div>
+    </aside>
+  </div>
+
+  <!-- MODAL AGENDA -->
+  <div id="agendaModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Agenda</h3>
+      <input type="date">
+    </div>
+  </div>
+
+    <!-- Modal Admin (senha) -->
+    <div id="adminModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="adminModal.style.display='none'">&times;</span>
+        <h3>Área Administrativa</h3>
+        <p>Digite a senha de administrador:</p>
+        <form id="adminForm">
+        <input type="password" id="adminPassword" placeholder="Senha" required>
+        <button type="submit">Enviar</button>
+        </form>
+        <!-- Aqui vai aparecer a mensagem -->
+        <p id="adminMsg" class="msg"></p>
+    </div>
+    </div>
+
+
+  <script src="../assets/js/scriptTecnico.js"></script>
+</body>
+</html>
+
