@@ -52,3 +52,76 @@ window.onclick = (e) => {
     e.target.style.display = "none";
   }
 };
+
+// Redirecionar ao clicar em "Sair"
+const logoutBtn = document.querySelector(".logout");
+if (logoutBtn) {
+  logoutBtn.onclick = () => {
+    window.location.href = "loginTecnico.html"; 
+  };
+}
+
+// --- Pesquisa + Filtros ---
+// Função utilitária para normalizar texto (remove acentos e deixa minúsculo)
+function normalizeText(str) {
+  if (!str) return "";
+  return str
+    .normalize('NFD')                    // separa acentos
+    .replace(/[\u0300-\u036f]/g, '')     // remove acentos
+    .toLowerCase()
+    .trim();
+}
+
+// Seleciona barra de pesquisa e cards de chamados
+const searchInput = document.querySelector(".topbar input");
+const callCards = document.querySelectorAll(".call-card");
+
+// Seletores de filtro
+const statusSelect = document.getElementById("status");
+const prioridadeSelect = document.getElementById("prioridade");
+const responsavelSelect = document.getElementById("responsavel");
+
+// Função que aplica pesquisa + filtros
+function aplicarFiltros() {
+  const searchText = searchInput.value.toLowerCase();
+  const status = statusSelect.value;
+  const prioridade = prioridadeSelect.value;
+  const responsavel = responsavelSelect.value;
+
+  callCards.forEach(card => {
+    const cardText = card.innerText.toLowerCase();
+    const cardStatus = card.querySelector(".status")?.classList[1]; // aberto / andamento / fechado
+    const cardPrioridade = card.querySelector(".priority")?.classList[1]; // baixa / media / alta
+
+    let mostrar = true;
+
+    // Filtro pesquisa
+    if (searchText && !cardText.includes(searchText)) {
+      mostrar = false;
+    }
+
+    // Filtro status
+    if (status && cardStatus !== status) {
+      mostrar = false;
+    }
+
+    // Filtro prioridade
+    if (prioridade && cardPrioridade !== prioridade) {
+      mostrar = false;
+    }
+
+    // Filtro responsável
+    if (responsavel && !cardText.includes(responsavel)) {
+      mostrar = false;
+    }
+
+    card.style.display = mostrar ? "block" : "none";
+  });
+}
+
+// Eventos de pesquisa e filtros
+if (searchInput) searchInput.addEventListener("input", aplicarFiltros);
+if (statusSelect) statusSelect.addEventListener("change", aplicarFiltros);
+if (prioridadeSelect) prioridadeSelect.addEventListener("change", aplicarFiltros);
+if (responsavelSelect) responsavelSelect.addEventListener("change", aplicarFiltros);
+

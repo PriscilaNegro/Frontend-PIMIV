@@ -11,14 +11,14 @@
     <!-- MENU LATERAL -->
     <aside class="sidebar">
       <div class="profile">
-        <img src="avatar.png" alt="Avatar Técnico">
-        <p>Patrícia</p>
+        <img src="../assets/img/avatarPat.png" alt="Avatar Técnico">
+        <p>Olá, Patrícia</p>
       </div>
       <nav>
         <ul>
           <li id="agendaBtn">📅 Agenda</li>
           <li><a href="relatorios.html">📊 Relatórios</a></li>  <!--Página futura-->
-          <li id="adminBtn">🛠️ Admin Console</li>
+          <li id="adminBtn">🛠️ Área Administrativa</li>
         </ul>
       </nav>
       <div class="logout">⇦ Sair</div>
@@ -33,11 +33,31 @@
       </header>
 
       <!-- Filtros -->
-      <div class="filters">
-        <button>Status</button>
-        <button>Prioridade</button>
-        <button>Responsável</button>
-      </div>
+    <div class="filters">
+        <label for="status">Status:</label>
+        <select id="status">
+            <option value="">Todos</option>
+            <option value="aberto">Aberto</option>
+            <option value="andamento">Em andamento</option>
+            <option value="fechado">Fechado</option>
+        </select>
+
+        <label for="prioridade">Prioridade:</label>
+        <select id="prioridade">
+            <option value="">Todas</option>
+            <option value="baixa">Baixa</option>
+            <option value="media">Média</option>
+            <option value="alta">Alta</option>
+        </select>
+
+    <label for="responsavel">Responsável:</label>
+    <select id="responsavel">
+        <option value="">Todos</option>
+        <option value="joao">João</option>
+        <option value="maria">Maria</option>
+        <option value="ana">Ana</option>
+    </select>
+    </div>
 
       <!-- Lista de chamados -->
       <section class="calls">
