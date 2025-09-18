@@ -63,7 +63,7 @@
       <section class="calls">
         <div class="call-card">
           <p><strong>Cód: #1235</strong> - Problema Office</p>
-          <p>João Pedro - 06/07/2025 15:30</p>
+          <p>Maria - 08/07/2025 17:28</p>
           <span class="priority baixa">Baixa</span>
           <span class="status aberto">Aberto</span>
         </div>
@@ -80,7 +80,9 @@
     <!-- PAINEL DIREITO -->
     <aside class="status-panel">
       <h3>Status</h3>
-      <div class="chart">[ Gráfico de Pizza Aqui ]</div>
+      <div class="chart-container" style="width: 250px; margin: auto;">
+       <canvas id="statusChart"></canvas>
+      </div>
       <div class="response-time">
         <h4>Tempo Médio de Resposta</h4>
         <p><strong>3 horas</strong></p>
@@ -112,8 +114,9 @@
     </div>
     </div>
 
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="../assets/js/scriptTecnico.js"></script>
+  
 </body>
 </html>
 

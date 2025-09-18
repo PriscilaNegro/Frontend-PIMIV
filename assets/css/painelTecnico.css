@@ -8,6 +8,8 @@
 .container {
   display: flex;
   height: 100vh;
+  width: 100%;         /* não ultrapassa */
+  overflow-x: hidden;  /* garante que nada vaze para o lado */
 }
 
 /* Sidebar */
@@ -96,6 +98,10 @@
   margin-bottom: 12px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  max-width: 85%;   /* <<< reduz um pouco a largura */
+  margin-left: auto;
+  margin-right: auto; /* centraliza o card */
 }
 
 .call-card span {
@@ -281,6 +287,30 @@
   color: white;
   border-radius: 6px;
   cursor: pointer;
+}
+
+/* Faz o layout principal respeitar o painel lateral */
+.main {
+  flex: 1;
+  padding: 20px;
+  background: #f5f6fa;
+  min-width: 0; /* evita forçar largura além do espaço */
+  overflow: hidden;  /* impede "vazar" e criar scroll */
+}
+
+/* Ajusta o painel direito */
+.status-panel {
+  flex: 0 0 260px; /* largura fixa do painel */
+  max-width: 260px;
+  background: #f1f1f1;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.status-panel canvas {
+  width: 100% !important;  /* ocupa só o espaço do painel */
+  height: auto !important; /* mantém proporção */
+  max-width: 220px;        /* evita estourar */
 }
 
 /* Animação de entrada */
