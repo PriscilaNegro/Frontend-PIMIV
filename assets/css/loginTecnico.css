@@ -220,6 +220,20 @@ body, html {
   transform: translateY(-2px);
 }
 
+.msg {
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.msg.erro {
+  color: #d9534f;
+}
+
+.msg.sucesso {
+  color: #28a745; 
+}
+
 @media (max-width: 768px) {
   .main-container {
     flex-direction: column;

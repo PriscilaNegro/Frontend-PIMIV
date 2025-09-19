@@ -1,18 +1,30 @@
-//Pádina Área de login técnico
+//Página Área de login técnico
     const formLogin = document.getElementById('form-login');
+    const erro = document.getElementById('erro-login');
+    const sucesso = document.getElementById('sucesso-login');
+    
     formLogin.addEventListener('submit', function(e) {
       e.preventDefault();
       const usuario = document.getElementById('usuario').value;
       const senha = document.getElementById('senha').value;
       
       if(usuario === 'tecnico' && senha === '123456') {
-        alert('Login realizado com sucesso!');
-        // Aqui redirecionar para a área do técnico
-        // window.location.href = 'painel-tecnico.html';
+        erro.style.display = 'none';
+        sucesso.style.display = 'block';
+        sucesso.textContent = '✅ Login realizado com sucesso! Redirecionando...';
+
+        // Salva sessão (simples, só pro frontend)
+        sessionStorage.setItem("logado", "true");
+
+        // Redireciona após 2 segundos
+        setTimeout(() => {
+          window.location.href = "painelTecnico.html";
+        }, 2000);
+
       } else {
-        const erro = document.getElementById('erro-login');
+        sucesso.style.display = 'none';
         erro.style.display = 'block';
-        erro.textContent = 'Usuário ou senha incorretos!';
+        erro.textContent = '❌ Usuário ou senha incorretos!';
       }
     });
 

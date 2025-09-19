@@ -22,6 +22,10 @@ if (pagina === "index.html") {
       }
 
       erro.style.display = "none"; // limpa mensagem
+      
+      // Marca que o chamado está ativo
+      sessionStorage.setItem("chamadoAtivo", codigo);
+
       window.location.href = `chamado.html?codigo=${encodeURIComponent(codigo)}`;
     });
 
@@ -38,12 +42,28 @@ if (pagina === "index.html") {
 
 // Página de acompanhamento (chamado.html)
 if (pagina === "chamado.html") {
+  // Verifica se o usuário tem um chamado ativo
+  const codigoAtivo = sessionStorage.getItem("chamadoAtivo");
+  if (!codigoAtivo) {
+    // Redireciona se não houver chamado ativo
+    window.location.href = "index.html";
+  }
+
   const params = new URLSearchParams(window.location.search);
   const codigo = params.get("codigo");
 
   if (codigo) {
     const display = document.getElementById("codigo");
     if (display) display.textContent = `#${codigo}`;
+  }
+
+  // Botão de sair
+  const btnSair = document.querySelector(".btn-sair");
+  if (btnSair) {
+    btnSair.addEventListener("click", () => {
+      sessionStorage.removeItem("chamadoAtivo"); // limpa sessão
+      window.location.href = "index.html"; // redireciona
+    });
   }
 }
 

@@ -1,3 +1,8 @@
+// Verifica se está logado
+if (sessionStorage.getItem("logado") !== "true") {
+  window.location.href = "loginTecnico.html";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // --- util ---
   function normalizeText(str) {
@@ -50,8 +55,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Logout
-  const logoutBtn = document.querySelector(".logout");
-  if (logoutBtn) logoutBtn.onclick = () => window.location.href = "loginTecnico.html";
+ const logoutBtn = document.querySelector(".logout");
+if (logoutBtn) {
+  logoutBtn.onclick = () => {
+    sessionStorage.removeItem("logado"); // limpa a sessão
+    window.location.href = "loginTecnico.html"; // redireciona
+  };
+}
 
   // --- Seletores (pesquisa + filtros + cards) ---
   const searchInput = document.querySelector(".topbar input");
