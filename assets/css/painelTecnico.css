@@ -57,7 +57,7 @@
 
 .topbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 20px;
 }
 
@@ -80,6 +80,9 @@
 /* Filters */
 .filters {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: center; /* centraliza horizontalmente */
+  gap: 15px; /* espaçamento entre os filtros */
 }
 
 .filters button {
