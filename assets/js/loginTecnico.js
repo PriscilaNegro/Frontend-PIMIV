@@ -8,13 +8,29 @@
       const usuario = document.getElementById('usuario').value;
       const senha = document.getElementById('senha').value;
       
-      if(usuario === 'tecnico' && senha === '123456') {
+      // Regex para validar se o e-mail termina com @4devs.com
+      const dominioValido = /^[a-zA-Z0-9._%+-]+@4devs\.com$/;
+
+      if(dominioValido.test(usuario)  && senha === '123456') {
         erro.style.display = 'none';
         sucesso.style.display = 'block';
         sucesso.textContent = '✅ Login realizado com sucesso! Redirecionando...';
 
         // Salva sessão (simples, só pro frontend)
         sessionStorage.setItem("logado", "true");
+
+        // Salva o e-mail do técnico logado
+        sessionStorage.setItem("tecnicoEmail", usuario);
+
+        // Ajuste: salva apenas o primeiro nome (antes do ponto e antes do @) ---
+        let nomeTecnico = usuario.split("@")[0]; // pega antes do @
+        if (nomeTecnico.includes(".") || nomeTecnico.includes("_")) {
+          nomeTecnico = nomeTecnico.split(/[._]/)[0]; // pega só antes do primeiro ponto
+        }
+
+        // Formata primeira letra maiúscula
+        nomeTecnico = nomeTecnico.charAt(0).toUpperCase() + nomeTecnico.slice(1);
+        sessionStorage.setItem("tecnicoNome", nomeTecnico);
 
         // Redireciona após 2 segundos
         setTimeout(() => {
@@ -24,8 +40,14 @@
       } else {
         sucesso.style.display = 'none';
         erro.style.display = 'block';
-        erro.textContent = '❌ Usuário ou senha incorretos!';
-      }
+
+        if (!dominioValido.test(usuario)) {
+        erro.textContent = '❌ E-mail inválido!';
+        } 
+          else {
+           erro.textContent = '❌ Usuário ou senha incorretos!';
+           }
+        }
     });
 
 // Modal "Esqueci minha senha"

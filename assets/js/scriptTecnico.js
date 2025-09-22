@@ -4,15 +4,16 @@ if (sessionStorage.getItem("logado") !== "true") {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // --- util ---
-  function normalizeText(str) {
-    if (!str) return "";
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim();
-  }
+
+// Exibir nome do técnico no sidebar
+const profileText = document.querySelector(".profile p");
+const tecnicoNome = sessionStorage.getItem("tecnicoNome");
+
+if (profileText && tecnicoNome) {
+  // Deixa a primeira letra maiúscula
+  const nomeFormatado = tecnicoNome.charAt(0).toUpperCase() + tecnicoNome.slice(1);
+  profileText.textContent = `Olá, ${tecnicoNome}`;
+}
 
   // --- Modal / botões ---
   const agendaBtn = document.getElementById("agendaBtn");
@@ -63,7 +64,7 @@ if (logoutBtn) {
   };
 }
 
-  // --- Seletores (pesquisa + filtros + cards) ---
+  // Seletores (pesquisa + filtros + cards)
   const searchInput = document.querySelector(".topbar input");
   const statusSelect = document.getElementById("status");
   const prioridadeSelect = document.getElementById("prioridade");
@@ -72,7 +73,16 @@ if (logoutBtn) {
   // Pega os cards dinamicamente (NodeList estática aqui — se for adicionar/remover cards dinamicamente, re-obter)
   const callCards = document.querySelectorAll(".call-card");
 
-  // --- Função de filtro (aplica pesquisa + selects) ---
+  function normalizeText(str) {
+    if (!str) return "";
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
+  // Função de filtro (aplica pesquisa + selects) ---
   function aplicarFiltros() {
     const searchText = normalizeText(searchInput?.value || "");
     const status = normalizeText(statusSelect?.value || "");
@@ -114,7 +124,7 @@ if (logoutBtn) {
   if (prioridadeSelect) prioridadeSelect.addEventListener("change", aplicarFiltros);
   if (responsavelSelect) responsavelSelect.addEventListener("change", aplicarFiltros);
 
-  // --- Chart.js: contadores a partir dos cards visíveis ---
+  // Chart.js: contadores a partir dos cards visíveis
   let statusChart = null;
 
   // Função que conta status dos cards (somente os visíveis)
