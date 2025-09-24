@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório do Técnico</title>
+  <link rel="stylesheet" href="../assets/css/relatorioTecnico.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h2>Relatório do Técnico</h2>
+    <p id="tecnicoNome"></p>
+  </header>
+
+  <main class="dashboard">
+    <!-- Resumo Diário -->
+    <section class="card">
+      <h3>Hoje</h3>
+      <ul>
+        <li>Aberto: <span id="abertosHoje">0</span></li>
+        <li>Em andamento: <span id="andamentoHoje">0</span></li>
+        <li>Fechado: <span id="fechadosHoje">0</span></li>
+        <li>Atrasado: <span id="atrasadosHoje">0</span></li>
+      </ul>
+      <p>Total: <span id="totalHoje">0</span></p>
+    </section>
+
+    <!-- Chamados Mensais -->
+    <section class="card">
+      <h3>Chamados Mensais</h3>
+      <p>Fechados: <span id="fechadosMes">0</span></p>
+      <p>Tempo médio de resposta: <span id="tempoMedio">0</span> min</p>
+    </section>
+
+    <!-- Gráfico -->
+    <section class="card">
+      <h3>Abertos x Fechados</h3>
+      <canvas id="graficoChamados"></canvas>
+    </section>
+  </main>
+
+  <script src="../assets/js/relatorioTecnico.js"></script>
+</body>
+</html>
