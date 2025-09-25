@@ -61,3 +61,23 @@ header p {
   max-width: 600px;
   height: 300px !important;
 }
+
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.btn-voltar {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-voltar:hover {
+  background-color: #217dbb;
+}

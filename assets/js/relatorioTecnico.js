@@ -1,10 +1,10 @@
 // Simulação: pega o nome do técnico logado do sessionStorage
-const tecnicoNome = sessionStorage.getItem("tecnicoNome") || "Técnico Exemplo";
+const tecnicoNome = sessionStorage.getItem ("tecnicoNome") || "Técnico Exemplo";
 document.getElementById("tecnicoNome").textContent = `Relatório de ${tecnicoNome}`;
 
 // Simulação de dados (mock)
 const mockData = {
-  "João": {
+  "Joao": {
     hoje: { abertos: 2, andamento: 1, fechados: 3, atrasados: 0 },
     mes: { fechados: 15, tempoMedio: 180 },
     grafico: {
@@ -13,6 +13,7 @@ const mockData = {
       fechados: [0, 1, 2]
     }
   },
+  
   "Maria": {
     hoje: { abertos: 1, andamento: 2, fechados: 2, atrasados: 1 },
     mes: { fechados: 10, tempoMedio: 220 },
@@ -67,8 +68,39 @@ new Chart(ctx, {
   },
   options: {
     responsive: true,
+    plugins: {
+      legend: {
+        display: true, //legenda visível
+        position: top
+      },
+      title: {
+        display: true,
+        text: "Quantidade de chamados por data"
+      }
+    },
     scales: {
-      y: { beginAtZero: true }
+      y: { 
+        beginAtZero: true,
+        ticks: {
+          stepSize: 1,
+          precision: 0
+        },
+        title: {
+          display: true,
+          text: "Quantidade de chamados"
+        }
+       },
+       x: {
+        title: {
+          display: true,
+          text: "Datas"
+        }
+       }
     }
   }
 });
+
+function voltarPainel() {
+  window.location.href = "painelTecnico.html";
+}
+
