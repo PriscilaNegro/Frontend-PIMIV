@@ -43,10 +43,17 @@ if (profileText && tecnicoNome) {
       e.preventDefault();
       const senha = document.getElementById("adminPassword").value;
       if (senha === "admin123") {
+        // seta a flag antes do redirect
+        sessionStorage.setItem("isAdmin", "true");
+       
         adminMsg.textContent = "✅ Acesso liberado! Redirecionando...";
         adminMsg.className = "msg sucesso";
         adminMsg.style.display = "block";
-        setTimeout(() => window.location.href = "relatorios-globais.html", 1500);
+        
+      // 🔑 Marca sessão de admin
+      sessionStorage.setItem("adminLogado", "true");
+
+        setTimeout(() => window.location.href = "relatorioAdmin.html", 1500);
       } else {
         adminMsg.textContent = "❌ Senha incorreta!";
         adminMsg.className = "msg erro";

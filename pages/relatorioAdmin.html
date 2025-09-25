@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório do Administrador</title>
+  <link rel="stylesheet" href="../assets/css/relatorioAdmin.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h2>Relatório do Administrador</h2>
+    <p>Visão geral da equipe de suporte</p>
+  </header>
+
+  <main class="dashboard">
+    <!-- Resumo Diário -->
+    <section class="card">
+      <h3>Hoje</h3>
+      <ul>
+        <li>Aberto: <span id="abertosHoje">0</span></li>
+        <li>Em andamento: <span id="andamentoHoje">0</span></li>
+        <li>Fechado: <span id="fechadosHoje">0</span></li>
+        <li>Atrasado: <span id="atrasadosHoje">0</span></li>
+      </ul>
+      <p>Total: <span id="totalHoje">0</span></p>
+    </section>
+
+    <!-- Chamados por Técnico -->
+    <section class="card">
+      <h3>Chamados por Atendente</h3>
+      <canvas id="graficoPorTecnico"></canvas>
+    </section>
+
+    <!-- Chamados Mensais -->
+    <section class="card">
+      <h3>Chamados Mensais</h3>
+      <p>Fechados: <span id="fechadosMes">0</span></p>
+      <p>Tempo médio de resposta: <span id="tempoMedio">0</span> min</p>
+      <canvas id="graficoMensal"></canvas>
+    </section>
+
+    <!-- Abertos x Fechados -->
+    <section class="card">
+      <h3>Abertos x Fechados por Data</h3>
+      <canvas id="graficoAbertosFechados"></canvas>
+    </section>
+  </main>
+
+  <!-- Botões de exportação -->
+  <div class="btn-container">
+    <button class="btn-export">⬇ Exportar PDF</button>
+    <button class="btn-export">⬇ Exportar Excel</button>
+  </div>
+
+  <!-- Botão voltar -->
+  <div class="btn-container">
+    <button onclick="voltarPainel()" class="btn-voltar">⬅ Voltar</button>
+  </div>
+
+  <script src="../assets/js/relatorioAdmin.js"></script>
+</body>
+</html>
