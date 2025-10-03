@@ -26,20 +26,37 @@
             maxlength="6">
           <button type="submit">Consultar</button>
           <p id="erro" style="color:red; display:none;"></p>
-        </form>
+        </form> 
 
         <p>Se estiver com problemas, acesse nossa página de dúvidas frenquentes</p>
         <a href="../pages/faq.html" class="btn-faq">❓FAQ </a>
 
         <p class="ou">OU</p>
 
-        <p>Converse com a Steph, nossa assistente virtual 🤖</p>
-        <button class="iniciar-chat">Iniciar Conversa</button>
+        <p>Converse com a Steph, a Assistente Virtual da 4Devs 🤖</p>
       </div>
     </div>
   </div>
-    
+  
   <script src="../assets/js/vlibras.js"></script>
   <script src="../assets/js/scriptUser.js"></script>
+
+  <!-- Botão para abrir o chat -->
+<div id="chat-widget">
+  <button id="chat-toggle">💬 Converse com a Steph</button>
+  <div id="chat-container" class="hidden">
+    <div class="chat-header">
+      Assistente Virtual da 4Devs
+      <span id="chat-close">✖</span>
+    </div>
+    <div id="chat-box" class="chat-box"></div>
+    <div class="chat-input">
+      <input type="text" id="user-input" placeholder="Digite sua mensagem..." disabled>
+      <button id="send-btn" disabled>Enviar</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/chatbot.js"></script>
 </body>
 </html>
