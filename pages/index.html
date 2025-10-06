@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>4Devs - Área do cliente</title>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
   <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
@@ -41,9 +42,21 @@
   <script src="../assets/js/vlibras.js"></script>
   <script src="../assets/js/scriptUser.js"></script>
 
-  <!-- Botão para abrir o chat -->
+<!-- Widget de chat -->
 <div id="chat-widget">
-  <button id="chat-toggle">💬 Converse com a Steph</button>
+  <div id="chat-character">
+    <lottie-player
+      src="../assets/animations/steph.json"
+      background="transparent"
+      speed="1"
+      style="width: 80px; height: 80px;"
+      loop
+      autoplay>
+    </lottie-player>
+  <span id="chat-bubble">💬 Converse comigo!</span>
+</div>
+
+  
   <div id="chat-container" class="hidden">
     <div class="chat-header">
       Assistente Virtual da 4Devs

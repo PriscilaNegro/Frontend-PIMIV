@@ -1,15 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const chatToggle = document.getElementById("chat-toggle");
+  const chatCharacter = document.getElementById("chat-character");
   const chatContainer = document.getElementById("chat-container");
   const chatClose = document.getElementById("chat-close");
   const chatBox = document.getElementById("chat-box");
   const userInput = document.getElementById("user-input");
   const sendBtn = document.getElementById("send-btn");
-
-  if (!chatToggle || !chatContainer || !chatBox || !userInput || !sendBtn) {
-    console.warn("Chat widget: elementos não encontrados. Verifique IDs no HTML.");
-    return;
-  }
 
   let step = 0;
   const userData = {};
@@ -138,20 +133,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") sendUserMessage();
   });
 
-  chatToggle.addEventListener("click", () => {
-    const isOpen = chatContainer.classList.contains("active");
-    if (isOpen) {
-      chatContainer.classList.remove("active");
-    } else {
-      chatContainer.classList.add("active");
-      userInput.disabled = true;
-      sendBtn.disabled = true;
-      if (step === 0 || step === 99) {
-        step = 0;
+  chatCharacter.addEventListener("click", () => {
+    chatContainer.classList.toggle("active");
+
+    if (step === 0 || step === 99) {
+      step = 0;
         setTimeout(() => startConversation(), 400);
-      }
     }
   });
+
 
   chatClose.addEventListener("click", () => {
     chatContainer.classList.remove("active");

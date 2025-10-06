@@ -157,18 +157,11 @@ body, html {
   z-index: 1000;
 }
 
-/* Caixa de chat */
-#chat-container {
-  display:none;
-  width: 300px;
-  height: 400px;
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+#chat-character {
   display: flex;
-  flex-direction: column;
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-  margin-bottom: 10px;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
 }
 
 /* caixa do chat — inicialmente invisível, animada por opacity/transform */
