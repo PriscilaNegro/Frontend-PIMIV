@@ -9,7 +9,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let step = 0;
   const userData = {};
 
-  // adicionar mensagem na tela
+  // ------------------- Funções de utilidade -------------------
+
   function addMessage(text, sender) {
     const el = document.createElement("div");
     el.className = `message ${sender}`;
@@ -18,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
-  // bot fala
   function botSay(text, expectInput = false, placeholder = "Digite aqui...") {
     setTimeout(() => {
       addMessage(text, "bot");
@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 400);
   }
 
-  // inicia conversa
   function startConversation() {
     step = 1;
     botSay("Olá! Sou a Steph, sua assistente virtual. 🤖");
@@ -41,43 +40,111 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function gerarProtocolo() {
-    return Math.floor(100000 + Math.random() * 900000); // 6 dígitos
+    const length = Math.floor(Math.random() * 3) + 4;
+    let protocolo = "";
+    for (let i = 0; i < length; i++) {
+      protocolo += Math.floor(Math.random() * 10);
+    }
+    return protocolo;
   }
 
-  // fluxo do bot
+  // ------------------- Funções de validação -------------------
+
+  function validarNome(nome) {
+    const clean = nome.trim();
+    return (
+      /^[A-Za-zÀ-ÿ\s]{3,}$/.test(clean) &&
+      /[aeiouáéíóúàèìòùãõâêîôû]/i.test(clean)
+    );
+  }
+
+  function validarEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  }
+
+  function validarTelefone(telefone) {
+    return /^\d{8,}$/.test(telefone.replace(/\D/g, ""));
+  }
+
+  function validarTexto(texto) {
+    const clean = texto.trim();
+    return (
+      clean.length > 2 &&
+      /[A-Za-zÀ-ÿ]/.test(clean) &&
+      /[aeiouáéíóúàèìòùãõâêîôû]/i.test(clean)
+    );
+  }
+
+  // ------------------- Fluxo da conversa -------------------
+
   function botFlow(userMsg) {
+    const msg = userMsg.trim().toLowerCase();
+
+    if (msg === "reiniciar") {
+      userInput.value = "";
+      for (let key in userData) userData[key] = "";
+      step = 0;
+      chatBox.innerHTML = "";
+      startConversation();
+      return;
+    }
+
     switch (step) {
-      case 1:
+      case 1: // Nome
+        if (!validarNome(userMsg)) {
+          botSay("Ops! Poderia digitar um nome válido, por favor?");
+          setTimeout(() => {
+            botSay("Qual é o seu nome?", true, "Digite seu nome...");
+          }, 600);
+          return;
+        }
         userData.nome = userMsg;
         botSay(`Prazer, ${userData.nome}! Agora, poderia me informar seu e-mail?`, true, "Digite seu e-mail...");
         step = 2;
         break;
 
-      case 2:
+      case 2: // Email
+        if (!validarEmail(userMsg)) {
+          botSay("Hmmm... esse e-mail parece inválido. Tente novamente, por favor. 📧", true, "Digite um e-mail válido...");
+          return;
+        }
         userData.email = userMsg;
         botSay("Perfeito! Qual o nome da sua empresa?", true, "Digite o nome da empresa...");
         step = 3;
         break;
 
-      case 3:
+      case 3: // Empresa
+        if (!validarTexto(userMsg)) {
+          botSay("Esse nome de empresa parece inválido. Pode tentar novamente?", true, "Digite o nome da empresa...");
+          return;
+        }
         userData.empresa = userMsg;
-        botSay("Ótimo 👍 E qual o seu telefone para contato?", true, "Ex: (11) 9xxxx-xxxx");
+        botSay("Ótimo 👍 E qual o seu telefone para contato?", true, "Ex: 11987654321");
         step = 4;
         break;
 
-      case 4:
+      case 4: // Telefone
+        if (!validarTelefone(userMsg)) {
+          botSay("O número de telefone deve conter apenas dígitos e ter pelo menos 8 números. 📱", true, "Digite apenas números...");
+          return;
+        }
         userData.telefone = userMsg;
         botSay("Agora, descreva o problema que você está enfrentando.", true, "Descreva o problema...");
         step = 5;
         break;
 
-      case 5:
-        userData.problema = userMsg.toLowerCase();
+      case 5: // Descrição do problema
+        if (!validarTexto(userMsg)) {
+          botSay("Não consegui entender o problema. Pode descrever de forma mais detalhada, por favor?", true, "Descreva melhor o problema...");
+          return;
+        }
 
-        if (userData.problema.includes("internet")) {
+        userData.problema = msg;
+
+        if (msg.includes("internet")) {
           botSay("Entendi, você está com problema de internet. 📶", false);
           setTimeout(() => {
-            botSay("Tente reiniciar o modem ou verificar os cabos de conexão. Isso resolveu? (sim / não)", true, "Digite: sim ou não");
+            botSay("Tente reiniciar o modem ou verificar os cabos. Isso resolveu? (sim / não)", true, "Digite: sim ou não");
             step = 6;
           }, 800);
         } else {
@@ -86,35 +153,60 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         break;
 
-      case 6: // resposta se internet resolveu ou não
-        if (userMsg.trim().toLowerCase() === "sim") {
-          botSay("Que ótimo! Fico feliz em ajudar 😊 Se precisar de mais alguma coisa, é só me chamar.", false);
-          step = 99;
-        } else {
+      case 6: // Resposta ao problema de internet
+        if (msg === "sim") {
+          botSay("Que ótimo! Fico feliz em ajudar 😊", false);
+          setTimeout(() => {
+            botSay("Se precisar de mais alguma coisa, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
+            step = 100;
+          }, 800);
+        } else if (msg === "não") {
           botSay("Entendi. Deseja abrir um chamado com nossa equipe? (sim / não)", true, "Digite: sim ou não");
           step = 7;
+        } else {
+          botSay("Desculpe, não entendi. Responda apenas com 'sim' ou 'não'.", true, "Digite: sim ou não");
         }
         break;
 
-      case 7: // abrir chamado
-        if (userMsg.trim().toLowerCase() === "sim") {
+      case 7: // Abrir chamado
+        if (msg === "sim") {
           const protocolo = gerarProtocolo();
           botSay(`Perfeito, registrei seu chamado com o protocolo #${protocolo}. ✅`, false);
-          botSay("Nossa equipe entrará em contato através do e-mail ou telefone informados.", false);
-          step = 99;
+          setTimeout(() => {
+            botSay("Nossa equipe entrará em contato através do e-mail ou telefone informados.", false);
+            setTimeout(() => {
+              botSay("Se precisar de mais alguma coisa, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
+              step = 100;
+            }, 800);
+          }, 800);
+        } else if (msg === "não") {
+          botSay("Certo, não abriremos um chamado agora.", false);
+          setTimeout(() => {
+            botSay("Se mudar de ideia, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
+            step = 100;
+          }, 800);
         } else {
-          botSay("Certo, não abriremos um chamado agora. Se mudar de ideia, é só reabrir o chat. 🙂", false);
-          step = 99;
+          botSay("Desculpe, não entendi. Responda apenas com 'sim' ou 'não'.", true, "Digite: sim ou não");
         }
         break;
 
-      default:
-        botSay("Se precisar de mais alguma coisa, reabra o chat.", false);
+      case 99:
+      case 100:
+        if (msg === "reiniciar") {
+          userInput.value = "";
+          for (let key in userData) userData[key] = "";
+          step = 0;
+          chatBox.innerHTML = "";
+          startConversation();
+        } else {
+          botSay("Se quiser iniciar uma nova conversa, digite 'reiniciar' 🙂", true, "Digite: reiniciar");
+        }
         break;
     }
   }
 
-  // envia mensagem do usuário
+  // ------------------- Envio de mensagens -------------------
+
   function sendUserMessage() {
     const text = userInput.value.trim();
     if (!text) return;
@@ -127,21 +219,20 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => botFlow(text), 200);
   }
 
-  // eventos
   sendBtn.addEventListener("click", sendUserMessage);
   userInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendUserMessage();
   });
 
+  // ------------------- Abertura e fechamento do chat -------------------
+
   chatCharacter.addEventListener("click", () => {
     chatContainer.classList.toggle("active");
-
     if (step === 0 || step === 99) {
       step = 0;
-        setTimeout(() => startConversation(), 400);
+      setTimeout(() => startConversation(), 400);
     }
   });
-
 
   chatClose.addEventListener("click", () => {
     chatContainer.classList.remove("active");
