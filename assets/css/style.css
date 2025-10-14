@@ -135,7 +135,7 @@ body, html {
 /* container do widget (botão + caixa) */
 #chat-widget {
   position: fixed;
-  bottom: 20px;
+  bottom: 40px;
   left:45%;
   z-index: 1000;
   display: flex;
@@ -162,6 +162,16 @@ body, html {
   align-items: center;
   gap: 8px;
   cursor: pointer;
+}
+
+#chat-character:hover {
+  transform: scale(1.07);
+}
+
+#chat-character lottie-player {
+  position: relative;
+  margin-right: 120px;
+  bottom: 250px; 
 }
 
 /* caixa do chat — inicialmente invisível, animada por opacity/transform */

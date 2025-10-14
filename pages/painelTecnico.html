@@ -6,6 +6,10 @@
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
   <title>Painel de Chamados - Técnico</title>
   <link rel="stylesheet" href="../assets/css/painelTecnico.css">
+  <link 
+    rel="stylesheet" 
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+  >
 </head>
 <body>
   <div class="container">
@@ -13,7 +17,7 @@
     <aside class="sidebar">
       <div class="profile">
         <img src="../assets/img/avatarPat.png" alt="Avatar Técnico">
-        <p>Olá, Patrícia</p>
+        <p>Olá, Técnico</p>
       </div>
       <nav>
         <ul>
@@ -34,16 +38,7 @@
 
       <!-- Filtros -->
     <div class="filters">
-        <label for="status">Status:</label>
-        <select id="status">
-            <option value="">Todos</option>
-            <option value="aberto">Aberto</option>
-            <option value="andamento">Em andamento</option>
-            <option value="fechado">Fechado</option>
-            <option value="atrasado">Atrasado</option>
-        </select>
-
-        <label for="prioridade">Prioridade:</label>
+      <label for="prioridade"><i class="fa-solid fa-chart-simple"></i> Prioridade:</label>
         <select id="prioridade">
             <option value="">Todas</option>
             <option value="baixa">Baixa</option>
@@ -51,8 +46,17 @@
             <option value="alta">Alta</option>
         </select>
 
-    <label for="responsavel">Responsável:</label>
-    <select id="responsavel">
+      <label for="status"><i class="fa-solid fa-gauge"></i> Status:</label>
+        <select id="status">
+            <option value="">Todos</option>
+            <option value="aberto">Aberto</option>
+            <option value="andamento">Em andamento</option>
+            <option value="fechado">Fechado</option>
+            <option value="atrasado">Atrasado</option>
+        </select>        
+
+      <label for="responsavel"><i class="fa-solid fa-user"></i> Responsável:</label>
+       <select id="responsavel">
         <option value="">Todos</option>
         <option value="joao">João</option>
         <option value="maria">Maria</option>
@@ -63,24 +67,63 @@
       <!-- Lista de chamados -->
       <section class="calls">
         <div class="call-card">
-          <p><strong>Cód: #1235</strong> - Problema Office</p>
-          <p>Maria - 08/07/2025 17:28</p>
-          <span class="priority baixa">Baixa</span>
-          <span class="status aberto">Aberto</span>
+          <p><strong>Cód: #3333</strong> - Sem conexão com a Internet</p>
+          <p>João Pedro - 06/07/2025 15:30</p>
+            <div class="info-line">
+              <span class="priority alta"><i class="fa-solid fa-chart-simple"></i>Alta</span>
+              <span class="status andamento"><i class="fa-solid fa-gauge"></i>Em andamento</span>
+            </div>
         </div>
 
         <div class="call-card">
-          <p><strong>Cód: #3333</strong> - Sem conexão com a Internet</p>
-          <p>João Pedro - 06/07/2025 15:30</p>
-          <span class="priority alta">Alta</span>
-          <span class="status andamento">Em andamento</span>
+          <p><strong>Cód: #6481</strong> - Sistema travou</p>
+          <p>Ana - 09/08/2025 11:48</p>
+          <div class="info-line">
+              <span class="priority baixa"><i class="fa-solid fa-chart-simple"></i>Baixa</span>
+              <span class="status atrasado"><i class="fa-solid fa-gauge"></i>Atrasado</span>
+           </div>
+        </div>
+
+        <div class="call-card">
+          <p><strong>Cód: #1235</strong> - Sistema não abre</p>
+          <p>Maria - 08/07/2025 17:28</p>
+            <div class="info-line">
+              <span class="priority baixa"><i class="fa-solid fa-chart-simple"></i>Baixa</span>
+              <span class="status aberto"><i class="fa-solid fa-gauge"></i>Aberto</span>
+           </div>
+        </div>
+
+        <div class="call-card">
+          <p><strong>Cód: #13654</strong> - Sem conexão com o servidor</p>
+          <p>João Pedro - 06/07/2025 18:01</p>
+            <div class="info-line">
+              <span class="priority media"><i class="fa-solid fa-chart-simple"></i>Média</span>
+              <span class="status andamento"><i class="fa-solid fa-gauge"></i>Em andamento</span>
+             </div>
         </div>
 
         <div class="call-card">
           <p><strong>Cód: #7895</strong> - Impressora não funciona</p>
           <p>Ana - 06/07/2025 15:30</p>
-          <span class="priority alta">Alta</span>
-          <span class="status fechado">Fechado</span>
+            <div class="info-line">
+              <span class="priority media"><i class="fa-solid fa-chart-simple"></i>Média</span>
+              <span class="status fechado"><i class="fa-solid fa-gauge"></i>Fechado</span>
+            </div>
+        </div>
+
+        <div class="call-card">
+          <p><strong>Cód: #2657</strong> - Sistema não abre</p>
+          <p>Ana - 02/08/2025 11:40</p>
+            <div class="info-line">
+              <span class="priority alta"><i class="fa-solid fa-chart-simple"></i>Alta</span>
+              <span class="status fechado"><i class="fa-solid fa-gauge"></i>Fechado</span>
+            </div>
+        </div>
+
+        <div class="pagination">
+          <button id="prevPage">«</button>
+          <span id="pageNumbers"></span>
+          <button id="nextPage">»</button>
         </div>
       </section>
     </main>

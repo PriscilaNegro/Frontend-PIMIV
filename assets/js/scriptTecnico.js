@@ -206,5 +206,56 @@ if (logoutBtn) {
   // inicializa o gráfico
   createChart();
 
-  // opcional: se você quiser recalcular o gráfico ao redimensionar ou em alguma ação externa, pode chamar updateChart()
+  // === PAGINAÇÃO ===
+const callsContainer = document.querySelector(".calls");
+const cards = Array.from(document.querySelectorAll(".call-card"));
+const itemsPerPage = 5;
+let currentPage = 1;
+
+function renderPagination() {
+  const totalPages = Math.ceil(cards.length / itemsPerPage);
+  const pageNumbers = document.getElementById("pageNumbers");
+  pageNumbers.innerHTML = "";
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement("button");
+    btn.textContent = i;
+    if (i === currentPage) btn.classList.add("active");
+    btn.addEventListener("click", () => {
+      currentPage = i;
+      showPage();
+    });
+    pageNumbers.appendChild(btn);
+  }
+}
+
+function showPage() {
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+
+  cards.forEach((card, index) => {
+    card.style.display = (index >= start && index < end) ? "block" : "none";
+  });
+
+  renderPagination();
+}
+
+document.getElementById("prevPage").addEventListener("click", () => {
+  if (currentPage > 1) {
+    currentPage--;
+    showPage();
+  }
+});
+
+document.getElementById("nextPage").addEventListener("click", () => {
+  const totalPages = Math.ceil(cards.length / itemsPerPage);
+  if (currentPage < totalPages) {
+    currentPage++;
+    showPage();
+  }
+});
+
+// Inicializa
+showPage();
+
 });

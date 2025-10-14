@@ -19,6 +19,10 @@
         <h1>Olá, Cliente!</h1>
         <h2>Bem-vindo à página de suporte técnico da 4Devs</h2>
 
+        <!-- Steph primeiro -->
+        <p>Converse com a Steph, nossa assistente virtual</p>
+
+        <!--Consulta de chamado -->
         <form id="form-chamado">
           <label for="chamado">Consulte o seu chamado 🔍</label>
           <input 
@@ -28,46 +32,45 @@
             maxlength="6">
           <button type="submit">Consultar</button>
           <p id="erro" style="color:red; display:none;"></p>
-        </form> 
+        </form>
 
-        <p>Se estiver com problemas, acesse nossa página de dúvidas frenquentes</p>
-        <a href="../pages/faq.html" class="btn-faq">❓FAQ </a>
-
+        <!-- FAQ -->
         <p class="ou">OU</p>
+        <p>Acesse nossa página de dúvidas frequentes</p>
+        <a href="../pages/faq.html" class="btn-faq">❓FAQ</a>
 
-        <p>Converse com a Steph, a Assistente Virtual da 4Devs 🤖</p>
       </div>
     </div>
   </div>
-  
-<!-- Widget de chat -->
-<div id="chat-widget">
-  <div id="chat-character">
-    <lottie-player
-      src="../assets/animations/steph.json"
-      background="transparent"
-      speed="1"
-      style="width: 150px; height: 150px;"
-      loop
-      autoplay>
-    </lottie-player>
-</div>
-  
-  <div id="chat-container" class="hidden">
-    <div class="chat-header">
-      Assistente Virtual da 4Devs
-      <span id="chat-close">✖</span>
+
+  <!-- Widget de chat -->
+  <div id="chat-widget">
+    <div id="chat-character">
+      <lottie-player
+        src="../assets/animations/steph.json"
+        background="transparent"
+        speed="1"
+        style="width: 150px; height: 150px;"
+        loop
+        autoplay>
+      </lottie-player>
     </div>
-    <div id="chat-box" class="chat-box"></div>
-    <div class="chat-input">
-      <input type="text" id="user-input" placeholder="Digite sua mensagem..." disabled>
-      <button id="send-btn" disabled>Enviar</button>
+
+    <div id="chat-container" class="hidden">
+      <div class="chat-header">
+        Assistente Virtual da 4Devs
+        <span id="chat-close">✖</span>
+      </div>
+      <div id="chat-box" class="chat-box"></div>
+      <div class="chat-input">
+        <input type="text" id="user-input" placeholder="Digite sua mensagem..." disabled>
+        <button id="send-btn" disabled>Enviar</button>
+      </div>
     </div>
   </div>
-</div>
 
-<script src="../assets/js/vlibras.js"></script>
-<script src="../assets/js/scriptUser.js"></script>
-<script src="../assets/js/chatbot.js"></script>
+  <script src="../assets/js/vlibras.js"></script>
+  <script src="../assets/js/scriptUser.js"></script>
+  <script src="../assets/js/chatbot.js"></script>
 </body>
 </html>
