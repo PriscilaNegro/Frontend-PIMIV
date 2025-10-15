@@ -9,8 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let step = 0;
   const userData = {};
 
-  // ------------------- Funções de utilidade -------------------
-
+  // -- Funções de utilidade --
   function addMessage(text, sender) {
     const el = document.createElement("div");
     el.className = `message ${sender}`;
@@ -48,8 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return protocolo;
   }
 
-  // ------------------- Funções de validação -------------------
-
+  // -- Funções de validação --
   function validarNome(nome) {
     const clean = nome.trim();
     return (
@@ -75,10 +73,17 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  // ------------------- Fluxo da conversa -------------------
+  // -- Fluxo da conversa --
+  // Normaliza o texto removendo acentos e colocando tudo em minúsculas
+  function normalizarTexto(texto) {
+    return texto
+      .toLowerCase()
+      .normalize("NFD") // separa acentos das letras
+      .replace(/[\u0300-\u036f]/g, ""); // remove os acentos
+  }
 
   function botFlow(userMsg) {
-    const msg = userMsg.trim().toLowerCase();
+    const msg = normalizarTexto(userMsg.trim());
 
     if (msg === "reiniciar") {
       userInput.value = "";
@@ -160,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
             botSay("Se precisar de mais alguma coisa, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
             step = 100;
           }, 800);
-        } else if (msg === "não") {
+        } else if (msg === "nao") {
           botSay("Entendi. Deseja abrir um chamado com nossa equipe? (sim / não)", true, "Digite: sim ou não");
           step = 7;
         } else {
@@ -179,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
               step = 100;
             }, 800);
           }, 800);
-        } else if (msg === "não") {
+        } else if (msg === "nao") {
           botSay("Certo, não abriremos um chamado agora.", false);
           setTimeout(() => {
             botSay("Se mudar de ideia, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
@@ -205,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ------------------- Envio de mensagens -------------------
+  // -- Envio de mensagens --
 
   function sendUserMessage() {
     const text = userInput.value.trim();
@@ -224,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") sendUserMessage();
   });
 
-  // ------------------- Abertura e fechamento do chat -------------------
+  // -- Abertura e fechamento do chat --
 
   chatCharacter.addEventListener("click", () => {
     chatContainer.classList.toggle("active");
@@ -241,4 +246,16 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") chatContainer.classList.remove("active");
   });
+
+  const abrirChatLink = document.getElementById("abrir-chat");
+  if (abrirChatLink) {
+    abrirChatLink.addEventListener("click", (e) => {
+      e.preventDefault(); // evita o comportamento padrão do link
+      chatContainer.classList.add("active");
+      if (step === 0 || step === 99) {
+        step = 0;
+        setTimeout(() => startConversation(), 400);
+      }
+    });
+  }
 });

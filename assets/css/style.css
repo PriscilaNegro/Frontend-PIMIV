@@ -34,7 +34,7 @@ body, html {
 
 .content-container {
   width: 80%;
-  max-width: 350px;
+  max-width: 400px;
   text-align: center;
 }
 
@@ -45,8 +45,15 @@ body, html {
 
 .content-container h2 {
   font-size: 1.2rem;
-  font-weight: normal;
-  margin-bottom: 1rem;
+  font-weight: 400;
+  color: #000000;
+  line-height: 1.5;
+  margin-bottom: 3rem;
+}
+
+.content-container p,
+.content-container label {
+  color: #2e2e2e;
 }
 
 /*Inputs*/
@@ -66,6 +73,10 @@ body, html {
 }
 
 /* Botão Consultar */
+#form-chamado {
+  margin-top: 1.5rem;
+}
+
 #form-chamado button {
   margin-top: 0.4rem;
   margin-bottom: 0.7rem;
@@ -107,7 +118,7 @@ body, html {
 }
 
 .content-container p {
-  margin: 1.5rem 1;
+  margin: 1.2rem 0;
 }
 
 .content-container p.ou {
@@ -136,10 +147,11 @@ body, html {
 #chat-widget {
   position: fixed;
   bottom: 40px;
-  left:45%;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 1000;
   display: flex;
-  flex-direction: column-reverse; /* botão fica abaixo, caixa acima */
+  flex-direction: column-reverse;
   align-items: center;
   gap: 8px;
   font-family: Arial, sans-serif;
@@ -160,18 +172,21 @@ body, html {
 #chat-character {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
   cursor: pointer;
+  transform: translateY(-200px); /* Sobe o boneco */
+  transition: transform 0.3s ease;
 }
 
 #chat-character:hover {
-  transform: scale(1.07);
+  transform: translateY(-200px) scale(1.07); /* Mantém a posição e faz o efeito hover */
 }
 
 #chat-character lottie-player {
-  position: relative;
-  margin-right: 120px;
-  bottom: 250px; 
+  width: 220px;
+  height: 220px;
+  margin: 0;
+  pointer-events: auto;
 }
 
 /* caixa do chat — inicialmente invisível, animada por opacity/transform */
@@ -274,6 +289,19 @@ body, html {
   border: none;
   padding: 0 14px;
   cursor: pointer;
+}
+
+#abrir-chat {
+  color: #00264d; 
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+#abrir-chat:hover {
+  color: #001f3f; 
+  text-decoration: underline;
 }
 
 /*Responsividade*/
