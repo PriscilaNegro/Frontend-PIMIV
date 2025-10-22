@@ -156,7 +156,7 @@
 
 /* Status */
 .status.aberto { background: blue; }
-.status.andamento { background: orange; }
+.status.andamento { background: rgb(242, 158, 1); }
 .status.fechado { background: green; }
 .status.atrasado { background: red; }
 
@@ -326,7 +326,6 @@
 .logout:hover {
   background: #1f4170;
 }
-
 
 .filter {
   display: inline-block;

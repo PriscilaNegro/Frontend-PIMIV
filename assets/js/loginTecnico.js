@@ -13,8 +13,7 @@
 
       if(dominioValido.test(usuario)  && senha === '123456') {
         erro.style.display = 'none';
-        sucesso.style.display = 'block';
-        sucesso.textContent = '✅ Login realizado com sucesso! Redirecionando...';
+        sucesso.style.display = 'none';
 
         // Salva sessão (simples, só pro frontend)
         sessionStorage.setItem("logado", "true");
@@ -32,10 +31,7 @@
         nomeTecnico = nomeTecnico.charAt(0).toUpperCase() + nomeTecnico.slice(1);
         sessionStorage.setItem("tecnicoNome", nomeTecnico);
 
-        // Redireciona após 2 segundos
-        setTimeout(() => {
-          window.location.href = "painelTecnico.html";
-        }, 2000);
+        window.location.href = "painelTecnico.html";
 
       } else {
         sucesso.style.display = 'none';

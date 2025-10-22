@@ -40,12 +40,14 @@ body, html {
 .content-container h1 {
   font-size: 2rem;
   margin-bottom: 1rem;
+  max-width: 500px;
 }
 
 .content-container h2 {
   font-size: 1.2rem;
   font-weight: normal;
-  margin-bottom: 1rem;
+  margin-bottom: 3rem;
+  white-space: nowrap;
 }
 
 .content-container input {
@@ -72,7 +74,7 @@ body, html {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 0.5rem;
+  margin-top: 1.5rem;
   transition: all 0.3s ease;
 }
 
