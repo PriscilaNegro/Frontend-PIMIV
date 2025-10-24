@@ -110,35 +110,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
       case 2: // Email
         if (!validarEmail(userMsg)) {
-          botSay("Hmmm... esse e-mail parece inválido. Tente novamente, por favor. 📧", true, "Digite um e-mail válido...");
-          return;
-        }
-        userData.email = userMsg;
-        botSay("Perfeito! Qual o nome da sua empresa?", true, "Digite o nome da empresa...");
-        step = 3;
-        break;
+        botSay("Hmmm... esse e-mail parece inválido. Tente novamente, por favor. 📧", true, "Digite um e-mail válido...");
+        return;
+      }
+      userData.email = userMsg;
+     botSay("Perfeito! Qual o seu telefone para contato?", true, "Ex: 11987654321");
+      step = 3;
+     break;
 
-      case 3: // Empresa
-        if (!validarTexto(userMsg)) {
-          botSay("Esse nome de empresa parece inválido. Pode tentar novamente?", true, "Digite o nome da empresa...");
-          return;
-        }
-        userData.empresa = userMsg;
-        botSay("Ótimo 👍 E qual o seu telefone para contato?", true, "Ex: 11987654321");
-        step = 4;
-        break;
-
-      case 4: // Telefone
-        if (!validarTelefone(userMsg)) {
-          botSay("O número de telefone deve conter apenas dígitos e ter pelo menos 8 números. 📱", true, "Digite apenas números...");
-          return;
-        }
-        userData.telefone = userMsg;
-        botSay("Agora, descreva o problema que você está enfrentando.", true, "Descreva o problema...");
-        step = 5;
-        break;
-
-      case 5: // Descrição do problema
+      case 3: // Telefone
+       if (!validarTelefone(userMsg)) {
+        botSay("O número de telefone deve conter apenas dígitos e ter pelo menos 8 números. 📱", true, "Digite apenas números...");
+        return;
+      }
+      userData.telefone = userMsg;
+      botSay("Agora, descreva o problema que você está enfrentando.", true, "Descreva o problema...");
+      step = 4;
+      break;
+      
+      case 4: // Descrição do problema
         if (!validarTexto(userMsg)) {
           botSay("Não consegui entender o problema. Pode descrever de forma mais detalhada, por favor?", true, "Descreva melhor o problema...");
           return;
@@ -150,15 +140,15 @@ document.addEventListener("DOMContentLoaded", () => {
           botSay("Entendi, você está com problema de internet. 📶", false);
           setTimeout(() => {
             botSay("Tente reiniciar o modem ou verificar os cabos. Isso resolveu? (sim / não)", true, "Digite: sim ou não");
-            step = 6;
+            step = 5;
           }, 800);
         } else {
           botSay("Não consegui identificar uma solução automática. Deseja abrir um chamado com nossa equipe? (sim / não)", true, "Digite: sim ou não");
-          step = 7;
+          step = 6;
         }
         break;
 
-      case 6: // Resposta ao problema de internet
+      case 5: // Resposta ao problema de internet
         if (msg === "sim") {
           botSay("Que ótimo! Fico feliz em ajudar 😊", false);
           setTimeout(() => {
@@ -167,13 +157,13 @@ document.addEventListener("DOMContentLoaded", () => {
           }, 800);
         } else if (msg === "nao") {
           botSay("Entendi. Deseja abrir um chamado com nossa equipe? (sim / não)", true, "Digite: sim ou não");
-          step = 7;
+          step = 6;
         } else {
           botSay("Desculpe, não entendi. Responda apenas com 'sim' ou 'não'.", true, "Digite: sim ou não");
         }
         break;
 
-      case 7: // Abrir chamado
+      case 6: // Abrir chamado
         if (msg === "sim") {
           const protocolo = gerarProtocolo();
           botSay(`Perfeito, registrei seu chamado com o protocolo #${protocolo}. ✅`, false);
