@@ -383,3 +383,24 @@
   from { transform: translateY(-20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+.calls {
+  /* permite que o card "cresça" sem ser cortado pelo pai */
+  overflow: visible;
+}
+
+.call-card {
+  transition: transform 0.24s ease, box-shadow 0.24s ease;
+  will-change: transform;
+  transform-origin: center;
+  /* garante que a interação fique óbvia */
+  cursor: pointer;
+  position: relative; /* necessário para z-index funcionar corretamente */
+  z-index: 1;
+}
+
+.call-card:hover {
+  transform: scale(1.04); /* aumenta 4% */
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+  z-index: 5; /* deixa em cima dos outros elementos */
+}

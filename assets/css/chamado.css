@@ -118,3 +118,50 @@ body {
     margin-bottom: 20px;
   }
 }
+
+/* Botões de edição da solução (técnico) */
+.botoes-tecnico {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-editar,
+.btn-salvar {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.btn-editar {
+  background: #457b9d;
+}
+
+.btn-editar:hover {
+  background: #1d3557;
+}
+
+.btn-salvar {
+  background: #2a9d8f;
+}
+
+.btn-salvar:hover {
+  background: #21867a;
+}
+
+#solucao-texto {
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  background-color: #fff;
+}
+

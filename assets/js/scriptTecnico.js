@@ -159,6 +159,19 @@ if (logoutBtn) {
     return counts;
   }
 
+  // Torna os cards clicáveis e envia o técnico para a página de acompanhamento
+document.querySelectorAll(".call-card").forEach(card => {
+  card.addEventListener("click", () => {
+    const codigo = card.dataset.id;
+     if (codigo) {
+      // Salva sessão como técnico logado
+      sessionStorage.setItem("usuarioTipo", "tecnico");
+      // Redireciona para acompanhamento com código
+      window.location.href = `chamado.html?codigo=${encodeURIComponent(codigo)}`;
+    }
+  });
+});
+
   // Cria o gráfico (se Chart estiver carregado e canvas existir)
   function createChart() {
     const canvas = document.getElementById('statusChart');

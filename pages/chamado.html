@@ -52,10 +52,17 @@
       </div>
 
       <div class="solucao">
-        <h2>Solução do Técnico</h2>
-        <p>Foi solicitado ao cliente desligar o modem, aguardar 2 minutos e ligar novamente. Feito isso a internet voltou a funcionar normalmente.</p>
-      </div>
+       <h2>Solução do Técnico</h2>
+        <textarea id="solucao-texto" readonly>
+          Foi solicitado ao cliente desligar o modem, aguardar 2 minutos e ligar novamente. Feito isso a internet voltou a funcionar normalmente.
+        </textarea>
 
+        <div id="botoes-tecnico" class="botoes-tecnico">
+         <button id="btnEditar" class="btn-editar">Editar</button>
+         <button id="btnSalvar" class="btn-salvar">Salvar</button>
+        </div>
+      </div>
+   
       <div class="sair-container">
         <button class="btn-sair" onclick="window.location.href='index.html'">Sair</button>
       </div>
