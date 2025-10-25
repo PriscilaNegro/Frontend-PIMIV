@@ -103,7 +103,6 @@ if (pagina === "chamado.html") {
       solucaoCampo.setAttribute("readonly", true);
       btnSalvar.style.display = "none";
       btnEditar.style.display = "inline-block";
-      alert("Solução salva com sucesso!");
     });
   }
 

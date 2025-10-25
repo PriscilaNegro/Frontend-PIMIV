@@ -156,12 +156,16 @@ body {
 
 #solucao-texto {
   width: 100%;
-  min-height: 100px;
-  resize: vertical;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  background-color: #fff;
+  min-height: 80px;
+  resize: none;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: #333;
+  font-family: inherit;
+  line-height: 1.5;
+  outline: none; /* remove borda azul quando clicado */
 }
+
 

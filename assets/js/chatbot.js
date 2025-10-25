@@ -164,26 +164,73 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
 
       case 6: // Abrir chamado
-        if (msg === "sim") {
-          const protocolo = gerarProtocolo();
-          botSay(`Perfeito, registrei seu chamado com o protocolo #${protocolo}. ✅`, false);
+       if (msg === "sim") {
+        // Exibe o checkbox de consentimento antes de continuar
+       const consentDiv = document.createElement("div");
+        consentDiv.className = "consentimento-container";
+        consentDiv.innerHTML = `
+          <label>
+            <input type="checkbox" id="consentimentoLGPD">
+            Aceito os <a href="#" id="abrir-termos">termos de consentimento</a>
+          </label>
+          <button id="confirmar-consentimento" class="btn-consentir">Confirmar</button>
+        `;
+        chatBox.appendChild(consentDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Bloqueia a digitação até o cliente aceitar
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+
+        // Abre o modal ao clicar em "termos"
+        document.getElementById("abrir-termos").addEventListener("click", (e) => {
+          e.preventDefault();
+          document.getElementById("lgpd-modal").style.display = "block";
+        });
+
+        // Fecha o modal
+        document.getElementById("close-modal").addEventListener("click", () => {
+        document.getElementById("lgpd-modal").style.display = "none";
+      });
+
+      // Fecha o modal ao clicar fora
+       window.addEventListener("click", (e) => {
+        if (e.target === document.getElementById("lgpd-modal")) {
+          document.getElementById("lgpd-modal").style.display = "none";
+        }
+        });
+
+      // Clique em "Confirmar"
+       document.getElementById("confirmar-consentimento").addEventListener("click", () => {
+        const check = document.getElementById("consentimentoLGPD");
+        if (!check.checked) {
+          botSay("Você precisa aceitar os termos para abrir o chamado. ⚠️");
+          return;
+        }
+
+        // Se aceitou, prossegue com o fluxo normal
+        const protocolo = gerarProtocolo();
+        consentDiv.remove();
+        botSay(`Perfeito, registrei seu chamado com o protocolo #${protocolo}. ✅`, false);
+        setTimeout(() => {
+          botSay("Nossa equipe entrará em contato através do e-mail ou telefone informados.", false);
           setTimeout(() => {
-            botSay("Nossa equipe entrará em contato através do e-mail ou telefone informados.", false);
-            setTimeout(() => {
-              botSay("Se precisar de mais alguma coisa, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
-              step = 100;
-            }, 800);
-          }, 800);
-        } else if (msg === "nao") {
-          botSay("Certo, não abriremos um chamado agora.", false);
-          setTimeout(() => {
-            botSay("Se mudar de ideia, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
+            botSay("Se precisar de mais alguma coisa, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
             step = 100;
           }, 800);
-        } else {
-          botSay("Desculpe, não entendi. Responda apenas com 'sim' ou 'não'.", true, "Digite: sim ou não");
-        }
-        break;
+        }, 800);
+      });
+
+    } else if (msg === "nao") {
+      botSay("Certo, não abriremos um chamado agora.", false);
+      setTimeout(() => {
+        botSay("Se mudar de ideia, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
+        step = 100;
+      }, 800);
+    } else {
+      botSay("Desculpe, não entendi. Responda apenas com 'sim' ou 'não'.", true, "Digite: sim ou não");
+    }
+    break;
 
       case 99:
       case 100:
