@@ -122,7 +122,7 @@ body {
 /* Botões de edição da solução (técnico) */
 .botoes-tecnico {
   margin-top: 10px;
-  display: flex;
+  display: none;
   gap: 10px;
 }
 

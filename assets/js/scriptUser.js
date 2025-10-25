@@ -26,6 +26,7 @@ if (pagina === "index.html") {
       // Marca que o chamado está ativo
       sessionStorage.setItem("chamadoAtivo", codigo);
 
+      sessionStorage.setItem("usuarioTipo", "cliente");
       window.location.href = `chamado.html?codigo=${encodeURIComponent(codigo)}`;
     });
 
@@ -58,14 +59,23 @@ if (pagina === "chamado.html") {
     if (display) display.textContent = `#${codigo}`;
   }
 
-    // ======== Exibe botões Editar/Salvar apenas para o técnico ========
+  // ======== Exibe botões Editar/Salvar apenas para o técnico ========
   const solucaoCampo = document.getElementById("solucao-texto");
   const btnEditar = document.getElementById("btnEditar");
   const btnSalvar = document.getElementById("btnSalvar");
   const botoesTecnico = document.getElementById("botoes-tecnico");
 
-  if (usuarioTipo === "tecnico") {
+  if (usuarioTipo === "tecnico" && botoesTecnico) {
     botoesTecnico.style.display = "flex"; // mostra os botões
+  }
+
+   // === Exibe a solução salva (caso exista) ===
+  if (solucaoCampo) {
+    const codigoChamado = codigo || codigoAtivo;
+    const solucaoSalva = sessionStorage.getItem(`solucao_${codigoChamado}`);
+    if (solucaoSalva) {
+      solucaoCampo.value = solucaoSalva;
+    }
   }
 
   if (btnEditar && btnSalvar && solucaoCampo) {
@@ -83,9 +93,13 @@ if (pagina === "chamado.html") {
         return;
       }
 
-      // Aqui futuramente você pode enviar para o backend via API
-      console.log("Solução salva:", texto);
+     // Aqui futuramente você pode enviar para o backend via API
+     // console.log("Solução salva:", texto);
 
+     // --- Salva localmente no sessionStorage ---
+      const codigoChamado = codigo || codigoAtivo; // pega o código atual
+      sessionStorage.setItem(`solucao_${codigoChamado}`, texto);
+      
       solucaoCampo.setAttribute("readonly", true);
       btnSalvar.style.display = "none";
       btnEditar.style.display = "inline-block";

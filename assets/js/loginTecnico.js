@@ -17,6 +17,7 @@
 
         // Salva sessão (simples, só pro frontend)
         sessionStorage.setItem("logado", "true");
+        sessionStorage.setItem("usuarioTipo", "tecnico");
 
         // Salva o e-mail do técnico logado
         sessionStorage.setItem("tecnicoEmail", usuario);
