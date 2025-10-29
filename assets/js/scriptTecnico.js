@@ -219,7 +219,7 @@ document.querySelectorAll(".call-card").forEach(card => {
   // inicializa o gráfico
   createChart();
 
-  // === PAGINAÇÃO ===
+  // PAGINAÇÃO 
 const callsContainer = document.querySelector(".calls");
 const cards = Array.from(document.querySelectorAll(".call-card"));
 const itemsPerPage = 5;

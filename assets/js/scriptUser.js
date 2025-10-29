@@ -48,7 +48,7 @@ if (pagina === "chamado.html") {
   const params = new URLSearchParams(window.location.search);
   const codigo = params.get("codigo");
 
-  // Se for cliente e não tiver chamado ativo → redireciona
+  // Se for cliente e não tiver chamado ativo (redireciona)
   if (usuarioTipo !== "tecnico" && !codigoAtivo) {
     window.location.href = "index.html";
   }
@@ -59,7 +59,7 @@ if (pagina === "chamado.html") {
     if (display) display.textContent = `#${codigo}`;
   }
 
-  // ======== Exibe botões Editar/Salvar apenas para o técnico ========
+  // Exibe botões Editar/Salvar apenas para o técnico 
   const solucaoCampo = document.getElementById("solucao-texto");
   const btnEditar = document.getElementById("btnEditar");
   const btnSalvar = document.getElementById("btnSalvar");
@@ -69,7 +69,7 @@ if (pagina === "chamado.html") {
     botoesTecnico.style.display = "flex"; // mostra os botões
   }
 
-   // === Exibe a solução salva (caso exista) ===
+   // Exibe a solução salva (caso exista) 
   if (solucaoCampo) {
     const codigoChamado = codigo || codigoAtivo;
     const solucaoSalva = sessionStorage.getItem(`solucao_${codigoChamado}`);
@@ -96,7 +96,7 @@ if (pagina === "chamado.html") {
      // Aqui futuramente você pode enviar para o backend via API
      // console.log("Solução salva:", texto);
 
-     // --- Salva localmente no sessionStorage ---
+     // Salva localmente no sessionStorage 
       const codigoChamado = codigo || codigoAtivo; // pega o código atual
       sessionStorage.setItem(`solucao_${codigoChamado}`, texto);
       
@@ -106,7 +106,7 @@ if (pagina === "chamado.html") {
     });
   }
 
-  // Botão sair → comportamento muda conforme tipo de usuário
+  // Botão sair (comportamento muda conforme tipo de usuário)
   const btnSair = document.querySelector(".btn-sair");
   if (btnSair) {
     btnSair.addEventListener("click", () => {
