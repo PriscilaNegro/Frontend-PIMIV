@@ -1,3 +1,5 @@
+import api from "./api.js";
+
 // Detecta qual página está aberta pelo nome do arquivo
 const pagina = window.location.pathname.split("/").pop();
 
@@ -59,6 +61,40 @@ if (pagina === "chamado.html") {
     if (display) display.textContent = `#${codigo}`;
   }
 
+  //Busca os dados do chamado no backend e exibe nos elementos HTML existentes
+  async function carregarChamado() {
+    try {
+      const codigoChamado = codigo || codigoAtivo;
+      const response = await api.get(`/chamados/${codigoChamado}`);
+      const chamado = response.data;
+
+      // Atualiza os elementos da tela com as informações do chamado
+      document.getElementById("status").textContent =
+        chamado.status || "Em andamento";
+      document.getElementById("descricao").textContent =
+        chamado.descricao || "Sem descrição";
+      document.getElementById("data-abertura").textContent = chamado.dataAbertura
+        ? new Date(chamado.dataAbertura).toLocaleDateString()
+        : "Data não informada";
+      document.getElementById("assunto").textContent =
+        chamado.assunto || "Sem assunto";
+      document.getElementById("prioridade").textContent =
+        chamado.prioridade || "Normal";
+      document.getElementById("solicitante").textContent =
+        chamado.solicitante || "Não informado";
+      document.getElementById("telefone").textContent =
+        chamado.telefone || "Não informado";
+      document.getElementById("email").textContent =
+        chamado.email || "Não informado";
+    } catch (error) {
+      console.error("Erro ao buscar chamado:", error);
+      alert("Erro ao carregar os dados do chamado. Tente novamente mais tarde.");
+    }
+  }
+
+  // Carrega as informações assim que a página abrir
+  carregarChamado();
+
   // Exibe botões Editar/Salvar apenas para o técnico 
   const solucaoCampo = document.getElementById("solucao-texto");
   const btnEditar = document.getElementById("btnEditar");
@@ -86,20 +122,35 @@ if (pagina === "chamado.html") {
       btnSalvar.style.display = "inline-block";
     });
 
-    btnSalvar.addEventListener("click", () => {
+    btnSalvar.addEventListener("click", async () => {
       const texto = solucaoCampo.value.trim();
       if (texto === "") {
         alert("Digite uma solução antes de salvar.");
         return;
       }
 
-     // Aqui futuramente você pode enviar para o backend via API
-     // console.log("Solução salva:", texto);
-
      // Salva localmente no sessionStorage 
-      const codigoChamado = codigo || codigoAtivo; // pega o código atual
-      sessionStorage.setItem(`solucao_${codigoChamado}`, texto);
+      const codigoChamado = codigo || codigoAtivo; 
       
+     // Chamada para o Backend
+      try {
+        const response = await api.post("/chamados/solucao", {
+          codigo: codigoChamado,
+          solucao: texto,
+          tecnico: "Maria"
+        });
+
+        console.log("Resposta do servidor:", response.data);
+
+        // Se der tudo certo no backend, também salva localmente
+        sessionStorage.setItem(`solucao_${codigoChamado}`, texto);
+
+        alert("Solução salva com sucesso!");}
+        catch (error){
+          console.error("Erro ao salvar solução:", error);
+          alert("Ocorreu um erro ao salvar a sulução")
+        }
+     
       solucaoCampo.setAttribute("readonly", true);
       btnSalvar.style.display = "none";
       btnEditar.style.display = "inline-block";

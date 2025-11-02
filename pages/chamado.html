@@ -33,29 +33,27 @@
       <div class="chamado-info">
         <div class="info-left">
          <p><strong>Cód Chamado:</strong> <span id="codigo"></span></p>
-         <p><strong>Assunto:</strong> Sem conexão com internet</p>
-         <p><strong>Prioridade:</strong> Alta</p>
-         <p><strong>Solicitante:</strong> Priscila</p>
+         <p><strong>Assunto:</strong><span id="assunto"></span></p>
+         <p><strong>Prioridade:</strong><span id="prioridade"></span></p>
+         <p><strong>Solicitante:</strong><span id="solicitante"></span></p>
         </div>
 
         <div class="info-right">
-          <p><strong>Data de Abertura:</strong> 07/08/2025</p>
-          <p><strong>Status:</strong> Finalizado</p>
-          <p><strong>Telefone:</strong> (16)9 81037631</p>
-          <p><strong>E-mail:</strong> priscila@gmail.com.br</p>
+          <p><strong>Data de Abertura:</strong><span id="data-abertura"></span></p>
+          <p><strong>Status:</strong><span id="status"></span></p>
+          <p><strong>Telefone:</strong><span id="telefone"></span></p>
+          <p><strong>E-mail:</strong><span id="email"></span></p>
         </div>
       </div>
 
       <div class="descricao">
         <h2>Descrição do Solicitante</h2>
-        <p>O computador não está conectando à internet via wi-fi. Tenho urgência que o meu computador volte a conectar no Wi-fi, pois a minha mesa não tem ponto de rede.</p>
+        <p id="descricao"></p>
       </div>
 
       <div class="solucao">
        <h2>Solução do Técnico</h2>
-        <textarea id="solucao-texto" readonly>
-          Foi solicitado ao cliente desligar o modem, aguardar 2 minutos e ligar novamente. Feito isso a internet voltou a funcionar normalmente.
-        </textarea>
+        <textarea id="solucao-texto" readonly></textarea>
 
         <div id="botoes-tecnico" class="botoes-tecnico">
          <button id="btnEditar" class="btn-editar">Editar</button>

@@ -1,3 +1,5 @@
+import api from "./api.js";
+
 document.addEventListener("DOMContentLoaded", () => {
   const chatCharacter = document.getElementById("chat-character");
   const chatContainer = document.getElementById("chat-container");
@@ -73,6 +75,16 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
+  async function enviarParaBackend(dados) {
+  try {
+    const response = await api.post("/chatbot", dados);
+    return response.data; // o backend deve retornar resposta: "texto da IA" 
+  } catch (error) {
+    console.error("Erro ao enviar para o backend:", error);
+    return { resposta: "Desculpe, houve um erro ao processar sua solicitação." };
+  }
+}
+
   // -- Fluxo da conversa --
   // Normaliza o texto removendo acentos e colocando tudo em minúsculas
   function normalizarTexto(texto) {
@@ -133,20 +145,23 @@ document.addEventListener("DOMContentLoaded", () => {
           botSay("Não consegui entender o problema. Pode descrever de forma mais detalhada, por favor?", true, "Descreva melhor o problema...");
           return;
         }
-
         userData.problema = msg;
 
-        if (msg.includes("internet")) {
-          botSay("Entendi, você está com problema de internet. 📶", false);
+        // Envia para o backend para tentar solução automática via IA
+        botSay("Estou analisando seu problema, só um momento... 🤔", false);
+
+        enviarParaBackend(userData).then((res) => {
+          const respostaIA = res.resposta || "Não consegui encontrar uma solução imediata.";
+
+          botSay(respostaIA, false);
+
+          // Dependendo da resposta, pode continuar o fluxo normal
           setTimeout(() => {
-            botSay("Tente reiniciar o modem ou verificar os cabos. Isso resolveu? (sim / não)", true, "Digite: sim ou não");
-            step = 5;
-          }, 800);
-        } else {
-          botSay("Não consegui identificar uma solução automática. Deseja abrir um chamado com nossa equipe? (sim / não)", true, "Digite: sim ou não");
-          step = 6;
-        }
-        break;
+            botSay("Deseja abrir um chamado com nossa equipe? (sim / não)", true, "Digite: sim ou não");
+            step = 6;
+          }, 1000);
+        });
+      break;
 
       case 5: // Resposta ao problema de internet
         if (msg === "sim") {
@@ -201,25 +216,50 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
       // Clique em "Confirmar"
-       document.getElementById("confirmar-consentimento").addEventListener("click", () => {
+       document.getElementById("confirmar-consentimento").addEventListener("click", async () => {
         const check = document.getElementById("consentimentoLGPD");
         if (!check.checked) {
           botSay("Você precisa aceitar os termos para abrir o chamado. ⚠️");
           return;
         }
 
-        // Se aceitou, prossegue com o fluxo normal
-        const protocolo = gerarProtocolo();
+      // Se aceitou, prossegue com o fluxo normal
+      const protocolo = gerarProtocolo();
+       
+      // Monta os dados do chamado
+      const chamado = {
+        codigo: protocolo,
+        nome: userData.nome,
+        email: userData.email,
+        telefone: userData.telefone,
+        problema: userData.problema,
+        status: "Aberto",
+        prioridade: "Média",
+        tecnico: "A definir",
+        dataAbertura: new Date().toISOString()
+      };
+
+       // Envia para o backend
+      try {
+        await api.post("/chamados", chamado);
         consentDiv.remove();
+
         botSay(`Perfeito, registrei seu chamado com o protocolo #${protocolo}. ✅`, false);
+      } catch (error) {
+        console.error("Erro ao registrar o chamado:", error);
+        botSay("Desculpe, houve um erro ao registrar o chamado. 😔", false);
+        return;
+      }
+
+      // Mensagens finais
+      setTimeout(() => {
+        botSay("Nossa equipe entrará em contato através do e-mail ou telefone informados.", false);
         setTimeout(() => {
-          botSay("Nossa equipe entrará em contato através do e-mail ou telefone informados.", false);
-          setTimeout(() => {
-            botSay("Se precisar de mais alguma coisa, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
-            step = 100;
-          }, 800);
+          botSay("Se precisar de mais alguma coisa, digite 'reiniciar' para começar novamente. 🙂", true, "Digite: reiniciar");
+          step = 100;
         }, 800);
-      });
+      }, 800);
+    });
 
     } else if (msg === "nao") {
       botSay("Certo, não abriremos um chamado agora.", false);
