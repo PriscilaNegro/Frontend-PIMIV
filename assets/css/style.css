@@ -191,6 +191,7 @@ body, html {
 
 /* caixa do chat — inicialmente invisível, animada por opacity/transform */
 #chat-container {
+  display:none;
   width: 320px;
   height: 420px;
   background: #fff;
@@ -210,14 +211,12 @@ body, html {
 
 /* quando ativa, aparece */
 #chat-container.active {
+  display: flex;
+  flex-direction: column;
   visibility: visible;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
-}
-
-.hidden {
-  display: none;
 }
 
 /* header */
