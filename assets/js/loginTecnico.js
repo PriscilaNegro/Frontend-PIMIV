@@ -3,48 +3,79 @@
     const erro = document.getElementById('erro-login');
     const sucesso = document.getElementById('sucesso-login');
     
-    formLogin.addEventListener('submit', function(e) {
+    formLogin.addEventListener('submit', async function(e) {
       e.preventDefault();
+
       const usuario = document.getElementById('usuario').value;
       const senha = document.getElementById('senha').value;
-      
-      // Regex para validar se o e-mail termina com @4devs.com
-      const dominioValido = /^[a-zA-Z0-9._%+-]+@4devs\.com$/;
+      const dominioValido = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-      if(dominioValido.test(usuario)  && senha === '123456') {
-        erro.style.display = 'none';
-        sucesso.style.display = 'none';
+      // Oculta mensagens antigas
+      erro.style.display = 'none';
+      sucesso.style.display = 'none';
 
-        // Salva sessão (simples, só pro frontend)
-        sessionStorage.setItem("logado", "true");
-        sessionStorage.setItem("usuarioTipo", "tecnico");
-
-        // Salva o e-mail do técnico logado
-        sessionStorage.setItem("tecnicoEmail", usuario);
-
-        // Ajuste: salva apenas o primeiro nome (antes do ponto e antes do @) ---
-        let nomeTecnico = usuario.split("@")[0]; // pega antes do @
-        if (nomeTecnico.includes(".") || nomeTecnico.includes("_")) {
-          nomeTecnico = nomeTecnico.split(/[._]/)[0]; // pega só antes do primeiro ponto
-        }
-
-        // Formata primeira letra maiúscula
-        nomeTecnico = nomeTecnico.charAt(0).toUpperCase() + nomeTecnico.slice(1);
-        sessionStorage.setItem("tecnicoNome", nomeTecnico);
-
-        window.location.href = "painelTecnico.html";
-
-      } else {
-        sucesso.style.display = 'none';
+      // Validação básica
+      if (!usuario || !senha) {
+        erro.textContent = '❌ Preencha todos os campos!';
         erro.style.display = 'block';
+        return;
+      }
 
-        if (!dominioValido.test(usuario)) {
+      if (!dominioValido.test(usuario)) {
+        erro.style.display = 'block';
         erro.textContent = '❌ E-mail inválido!';
-        } 
-          else {
-           erro.textContent = '❌ Usuário ou senha incorretos!';
-           }
+        sucesso.style.display = 'none';
+        return;
+      }
+
+      try {
+        // Envia a requisição ao backend
+        const response = await fetch('http://localhost:3000/api/login-tecnico', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: usuario,
+            senha: senha,
+          }),
+        });
+
+        // Se o login falhar, exibe erro
+        if (!response.ok) {
+         throw new Error('Usuário ou senha incorretos!');
         }
+
+        // Converte a resposta JSON
+        const data = await response.json();
+
+        // Espera-se que o backend retorne algo assim:
+        // {
+        //   token: "jwt_aqui",
+        //   nome: "Priscila",
+        //   email: "tecnico@4devs.com"
+        // }
+
+        // Salva as informações de sessão
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('tecnicoNome', data.nome);
+        localStorage.setItem('tecnicoEmail', data.email);
+        localStorage.setItem('usuarioTipo', 'tecnico');
+
+        sucesso.textContent = '✅ Login realizado com sucesso!';
+        sucesso.style.display = 'block';
+
+        // Redireciona após 1 segundo
+        setTimeout(() => {
+          window.location.href = 'painelTecnico.html';
+        }, 1000);
+
+      } catch (error) {
+        console.error('Erro ao conectar com o servidor:', error);
+        erro.style.display = 'block';
+        sucesso.style.display = 'none';
+        erro.textContent = '❌ Erro ao conectar com o servidor!';
+      }
     });
 
 // Modal "Esqueci minha senha"
