@@ -1,5 +1,7 @@
 import api from "./api.js";
 
+document.addEventListener('DOMContentLoaded', () => {
+
   //Página Área de login técnico
   const formLogin = document.getElementById('form-login');
   const erro = document.getElementById('erro-login');
@@ -67,62 +69,66 @@ import api from "./api.js";
     }
   });
 
-// Modal "Esqueci minha senha"
-const modal = document.getElementById("modal-recuperar");
-const linkEsqueci = document.getElementById("link-esqueci");
-const fechar = document.querySelector(".fechar");
+  // Modal "Esqueci minha senha"
+  const modal = document.getElementById("modal-recuperar");
+  const linkEsqueci = document.getElementById("link-esqueci");
+  const fechar = document.querySelector(".fechar");
+  const btnRecuperar = document.getElementById("btn-recuperar");
+  const msgRecuperar = document.getElementById("msg-recuperar");
+  const btnOk = document.getElementById("btn-ok");
 
-if (linkEsqueci) {
-  linkEsqueci.addEventListener("click", function(e) {
-    e.preventDefault();
-    modal.style.display = "flex";
-  });
-}
-
-if (fechar) {
-  fechar.addEventListener("click", function() {
-    modal.style.display = "none";
-  });
-}
-
-window.addEventListener("click", function(e) {
-  if (e.target === modal) {
-    modal.style.display = "none";
+  if (linkEsqueci) {
+    linkEsqueci.addEventListener("click", function(e) {
+      e.preventDefault();
+      modal.classList.add("ativo");
+    });
   }
-});
 
-// Simulação de envio
-const btnRecuperar = document.getElementById("btn-recuperar");
-const msgRecuperar = document.getElementById("msg-recuperar");
-const btnOk = document.getElementById("btn-ok");
+  if (fechar) {
+    fechar.addEventListener("click", function() {
+     modal.classList.remove("ativo");
+     msgRecuperar.className = "msg-recuperar"; // limpa mensagens antigas
+     document.getElementById("email-recuperar").value = "";
+     btnOk.style.display = "none";
+    });
+  }
 
-if (btnRecuperar) {
-  btnRecuperar.addEventListener("click", function() {
-    const email = document.getElementById("email-recuperar").value.trim();
-
-    if (!email) {
-      msgRecuperar.textContent = "Por favor, insira seu e-mail.";
-      msgRecuperar.className = "msg-recuperar erro";
-      btnOk.style.display = "none";
-      return;
-    }
-
-    // Mensagem sempre genérica
-    msgRecuperar.textContent = "Se este e-mail estiver cadastrado, enviaremos as instruções de redefinição.";
-    msgRecuperar.className = "msg-recuperar sucesso";
-
-    // Mostra botão OK
-    btnOk.style.display = "block";
-  });
-}
-
-// Botão OK fecha o modal
-if (btnOk) {
-  btnOk.addEventListener("click", function() {
-    modal.style.display = "none";
-    msgRecuperar.style.display = "none";
-    btnOk.style.display = "none";
+  window.addEventListener("click", function(e) {
+   if (e.target === modal) {
+    modal.classList.remove("ativo");
+    msgRecuperar.className = "msg-recuperar"; 
     document.getElementById("email-recuperar").value = "";
+    btnOk.style.display = "none";
+    }
   });
-}
 
+  if (btnRecuperar) {
+    btnRecuperar.addEventListener("click", function() {
+      const email = document.getElementById("email-recuperar").value.trim();
+
+      if (!email) {
+        msgRecuperar.textContent = "Por favor, insira seu e-mail.";
+        msgRecuperar.className = "msg-recuperar erro";
+        btnOk.style.display = "none";
+        return;
+      }
+
+      // Mensagem sempre genérica
+      msgRecuperar.textContent = "Se este e-mail estiver cadastrado, enviaremos as instruções de redefinição.";
+      msgRecuperar.className = "msg-recuperar sucesso";
+
+      // Mostra botão OK
+      btnOk.style.display = "block";
+    });
+  }
+
+  // Botão OK fecha o modal
+  if (btnOk) {
+    btnOk.addEventListener("click", function() {
+      modal.classList.remove("ativo");
+      msgRecuperar.className = "msg-recuperar";
+      document.getElementById("email-recuperar").value = "";
+      btnOk.style.display = "none";
+  });
+ }
+});

@@ -112,7 +112,7 @@ body, html {
 
 /* Modal fundo */
 .modal {
-  display: none;
+  display: flex;
   position: fixed;
   z-index: 1000;
   left: 0;
@@ -122,6 +122,15 @@ body, html {
   background: rgba(0,0,0,0.5);
   justify-content: center;
   align-items: center;
+  flex-direction: column; 
+  opacity: 0; 
+  pointer-events: none; 
+  transition: opacity 0.3s ease;
+}
+
+.modal.ativo {
+  opacity: 1;
+  pointer-events: all;
 }
 
 /* Caixa do modal */
