@@ -1,18 +1,20 @@
-//Página Área de login técnico
-    const formLogin = document.getElementById('form-login');
-    const erro = document.getElementById('erro-login');
-    const sucesso = document.getElementById('sucesso-login');
+import api from "./api.js";
+
+  //Página Área de login técnico
+  const formLogin = document.getElementById('form-login');
+  const erro = document.getElementById('erro-login');
+  const sucesso = document.getElementById('sucesso-login');
     
-    formLogin.addEventListener('submit', async function(e) {
-      e.preventDefault();
+   formLogin.addEventListener('submit', async function(e) {
+     e.preventDefault();
 
-      const usuario = document.getElementById('usuario').value;
-      const senha = document.getElementById('senha').value;
-      const dominioValido = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const usuario = document.getElementById('usuario').value;
+    const senha = document.getElementById('senha').value;
+    const dominioValido = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-      // Oculta mensagens antigas
-      erro.style.display = 'none';
-      sucesso.style.display = 'none';
+    // Oculta mensagens antigas
+    erro.style.display = 'none';
+    sucesso.style.display = 'none';
 
       // Validação básica
       if (!usuario || !senha) {
@@ -30,31 +32,12 @@
 
       try {
         // Envia a requisição ao backend
-        const response = await fetch('http://localhost:3000/api/login-tecnico', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: usuario,
-            senha: senha,
-          }),
+        const response = await api.post('/login-tecnico', {
+          email: usuario,
+          senha: senha
         });
 
-        // Se o login falhar, exibe erro
-        if (!response.ok) {
-         throw new Error('Usuário ou senha incorretos!');
-        }
-
-        // Converte a resposta JSON
-        const data = await response.json();
-
-        // Espera-se que o backend retorne algo assim:
-        // {
-        //   token: "jwt_aqui",
-        //   nome: "Priscila",
-        //   email: "tecnico@4devs.com"
-        // }
+        const data = response.data;
 
         // Salva as informações de sessão
         localStorage.setItem('token', data.token);
@@ -74,9 +57,15 @@
         console.error('Erro ao conectar com o servidor:', error);
         erro.style.display = 'block';
         sucesso.style.display = 'none';
+    
+      // Exibe erro adequado conforme resposta do servidor
+      if (error.response && error.response.status === 401) {
+        erro.textContent = '❌ Usuário ou senha incorretos!';
+      } else {
         erro.textContent = '❌ Erro ao conectar com o servidor!';
       }
-    });
+    }
+  });
 
 // Modal "Esqueci minha senha"
 const modal = document.getElementById("modal-recuperar");

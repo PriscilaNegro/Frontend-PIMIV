@@ -1,7 +1,7 @@
 // Verifica se está logado
-if (sessionStorage.getItem("logado") !== "true") {
-  window.location.href = "loginTecnico.html";
-}
+//if (sessionStorage.getItem("logado") !== "true") {
+  //window.location.href = "loginTecnico.html";
+//}
 
 document.addEventListener("DOMContentLoaded", () => {
 
