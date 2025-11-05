@@ -41,37 +41,46 @@ if (profileText && tecnicoNome) {
   const adminForm = document.getElementById("adminForm");
   const adminMsg = document.getElementById("adminMsg");
   if (adminForm) {
-    adminForm.onsubmit = function(e) {
-      e.preventDefault();
-      const senha = document.getElementById("adminPassword").value;
-      if (senha === "admin123") {
-        // seta a flag antes do redirect
+  adminForm.onsubmit = async function(e) {
+    e.preventDefault();
+
+    const senha = document.getElementById("adminPassword").value;
+    adminMsg.textContent = "Verificando...";
+    adminMsg.className = "msg neutro";
+    adminMsg.style.display = "block";
+
+    try {
+      //Envia senha para o backend
+      const response = await api.post("/admin/validar", { senha });
+
+      if (response.data && response.data.isAdmin === true) {
         sessionStorage.setItem("isAdmin", "true");
-       
+        sessionStorage.setItem("adminLogado", "true");
+
         adminMsg.textContent = "✅ Acesso liberado! Redirecionando...";
         adminMsg.className = "msg sucesso";
-        adminMsg.style.display = "block";
-        
-       //Marca sessão de admin
-       sessionStorage.setItem("adminLogado", "true");
 
         setTimeout(() => window.location.href = "relatorioAdmin.html", 1500);
       } else {
-        adminMsg.textContent = "❌ Senha incorreta!";
+        adminMsg.textContent = "❌ Acesso negado. Senha inválida.";
         adminMsg.className = "msg erro";
-        adminMsg.style.display = "block";
       }
-    };
-  }
-
-  // Logout
- const logoutBtn = document.querySelector(".logout");
-if (logoutBtn) {
-  logoutBtn.onclick = () => {
-    sessionStorage.removeItem("logado"); // limpa a sessão
-    window.location.href = "loginTecnico.html"; // redireciona
+    } catch (error) {
+      console.error("Erro ao validar administrador:", error);
+      adminMsg.textContent = "⚠️ Erro na comunicação com o servidor.";
+      adminMsg.className = "msg erro";
+    }
   };
 }
+
+ // Logout
+ const logoutBtn = document.querySelector(".logout");
+  if (logoutBtn) {
+    logoutBtn.onclick = () => {
+      sessionStorage.removeItem("logado"); // limpa a sessão
+      window.location.href = "loginTecnico.html"; // redireciona
+    };
+  }
 
   // Seletores (pesquisa + filtros + cards)
   const searchInput = document.querySelector(".topbar input");
@@ -98,8 +107,7 @@ if (logoutBtn) {
    //Função para carregar chamados do backend
   async function carregarChamados() {
     try {
-      const baseUrl = "https://localhost:7202/api";
-      const response = await api.get(`${baseUrl}/chamado/${codigoChamado}`); // endpoint da API
+      const response = await api.get(`/chamado/${codigoChamado}`); // endpoint da API
       renderChamados(response.data);
     } catch (error) {
       console.error("Erro ao carregar chamados:", error);

@@ -57,3 +57,15 @@ ul {
 .btn-export:hover {
   background-color: #217dbb;
 }
+
+.erro-msg {
+  background-color: #ffe5e5;
+  color: #b30000;
+  border: 1px solid #ff9999;
+  padding: 10px 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  margin: 20px auto;
+  max-width: 500px;
+}

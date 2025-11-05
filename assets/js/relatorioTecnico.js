@@ -1,39 +1,29 @@
-// Simulação: pega o nome do técnico logado do sessionStorage
-const tecnicoNome = sessionStorage.getItem ("tecnicoNome") || "Técnico Exemplo";
-document.getElementById("tecnicoNome").textContent = `Relatório de ${tecnicoNome}`;
+import api from "./api.js";
 
-// Simulação de dados (mock)
-const mockData = {
-  "Joao": {
-    hoje: { abertos: 2, andamento: 1, fechados: 3, atrasados: 0 },
-    mes: { fechados: 15, tempoMedio: 180 },
-    grafico: {
-      datas: ["01/09", "02/09", "03/09"],
-      abertos: [1, 0, 1],
-      fechados: [0, 1, 2]
-    }
-  },
-  
-  "Maria": {
-    hoje: { abertos: 1, andamento: 2, fechados: 2, atrasados: 1 },
-    mes: { fechados: 10, tempoMedio: 220 },
-    grafico: {
-      datas: ["01/09", "02/09", "03/09"],
-      abertos: [0, 1, 0],
-      fechados: [1, 0, 1]
-    }
+document.addEventListener("DOMContentLoaded", async () => {
+
+//Pega o nome do técnico logado 
+ const tecnicoNome = sessionStorage.getItem ("tecnicoNome") || "Técnico";
+ const tecnicoId = sessionStorage.getItem("tecnicoId");
+ document.getElementById("tecnicoNome").textContent = `Relatório de ${tecnicoNome}`;
+
+   try {
+    // Faz a requisição para o backend
+    const response = await api.get(`/relatorios/tecnico/${tecnicoId}`);
+    const dadosChamados = response.data;
+
+    preencherRelatorio(dadosChamados);
+  } 
+  catch (error) {
+    console.error("Erro ao carregar relatório do administrador:", error);
+    const erroMsg = document.getElementById("erroMsg");
+    erroMsg.textContent = "⚠️ Não foi possível carregar os dados do relatório. Tente novamente mais tarde.";
+    erroMsg.style.display = "block";
   }
-};
-
-// Se não existir o nome, cai em um padrão
-const dadosChamados = mockData[tecnicoNome] || {
-  hoje: { abertos: 0, andamento: 0, fechados: 0, atrasados: 0 },
-  mes: { fechados: 0, tempoMedio: 0 },
-  grafico: { datas: [], abertos: [], fechados: [] }
-};
-
+});
 
 // Preenche valores
+function preencherRelatorio(dadosChamados) {
 document.getElementById("abertosHoje").textContent = dadosChamados.hoje.abertos;
 document.getElementById("andamentoHoje").textContent = dadosChamados.hoje.andamento;
 document.getElementById("fechadosHoje").textContent = dadosChamados.hoje.fechados;
@@ -71,7 +61,7 @@ new Chart(ctx, {
     plugins: {
       legend: {
         display: true, //legenda visível
-        position: top
+        position: "top"
       },
       title: {
         display: true,
@@ -99,8 +89,9 @@ new Chart(ctx, {
     }
   }
 });
+}
 
-function voltarPainel() {
+window.voltarPainel = function() {
   window.location.href = "painelTecnico.html";
 }
 
