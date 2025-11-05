@@ -65,27 +65,54 @@ if (pagina === "chamado.html") {
   async function carregarChamado() {
     try {
       const codigoChamado = codigo || codigoAtivo;
-      const response = await api.get(`/chamados/${codigoChamado}`);
+      const baseUrl = "https://localhost:7202/api";
+      const response = await api.get(`${baseUrl}/chamado/protocolo/${codigoChamado}`);
       const chamado = response.data;
+
+      const prioridades = {
+        0: "Baixa",
+        1: "Média",
+        2: "Alta"
+      };
+
+      const status = {
+        0: "Aberto",
+        1: "Em Andamento",
+        2: "Fechado"
+      };
+
+      const dataAbertura = chamado.dataAbertura
+      ? new Date(chamado.dataAbertura)
+      : null;
 
       // Atualiza os elementos da tela com as informações do chamado
       document.getElementById("status").textContent =
-        chamado.status || "Em andamento";
+        status[chamado.status] || "Desconhecido";
       document.getElementById("descricao").textContent =
-        chamado.descricao || "Sem descrição";
-      document.getElementById("data-abertura").textContent = chamado.dataAbertura
-        ? new Date(chamado.dataAbertura).toLocaleDateString()
-        : "Data não informada";
+        chamado.descricao;
+      document.getElementById("data-abertura").textContent = 
+        chamado.dataAbertura? dataAbertura.toLocaleDateString("pt-BR") : "Não informada";
       document.getElementById("assunto").textContent =
-        chamado.assunto || "Sem assunto";
+        chamado.titulo;
       document.getElementById("prioridade").textContent =
-        chamado.prioridade || "Normal";
+        prioridades[chamado.prioridade] || "Não informada";
       document.getElementById("solicitante").textContent =
-        chamado.solicitante || "Não informado";
+        chamado.usuario.nome;
       document.getElementById("telefone").textContent =
-        chamado.telefone || "Não informado";
+        chamado.usuario.telefone;
       document.getElementById("email").textContent =
-        chamado.email || "Não informado";
+        chamado.usuario.email;
+      document.getElementById("tecnico").textContent =
+        chamado.tecnico.nome;
+      
+      if (chamado.solucao == null ){
+        document.getElementById("solucao-texto").textContent =
+          "Solução ainda não registrada.";
+      } else {
+        document.getElementById("solucao-texto").textContent =
+          chamado.solucao.descricao
+      }
+
     } catch (error) {
       console.error("Erro ao buscar chamado:", error);
       alert("Erro ao carregar os dados do chamado. Tente novamente mais tarde.");
@@ -134,11 +161,7 @@ if (pagina === "chamado.html") {
       
      // Chamada para o Backend
       try {
-        const response = await api.post("/chamados/solucao", {
-          codigo: codigoChamado,
-          solucao: texto,
-          tecnico: "Maria"
-        });
+        const response = await api.get(`${baseUrl}/api/solucao`);
 
         console.log("Resposta do servidor:", response.data);
 

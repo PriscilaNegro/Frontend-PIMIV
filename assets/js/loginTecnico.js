@@ -34,7 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         // Envia a requisição ao backend
-        const response = await api.post('/login-tecnico', {
+        const baseUrl = "https://localhost:7202/api";
+        const response = await api.post(`${baseUrl}/tecnico/login`, {
           email: usuario,
           senha: senha
         });

@@ -1,9 +1,11 @@
-// Verifica se está logado
-//if (sessionStorage.getItem("logado") !== "true") {
-  //window.location.href = "loginTecnico.html";
-//}
+import api from "./api.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+
+// Verifica se está logado
+//if (sessionStorage.getItem("logado") !== "true") {
+ //window.location.href = "loginTecnico.html";
+//}
 
 // Exibir nome do técnico no sidebar
 const profileText = document.querySelector(".profile p");
@@ -12,10 +14,10 @@ const tecnicoNome = sessionStorage.getItem("tecnicoNome");
 if (profileText && tecnicoNome) {
   // Deixa a primeira letra maiúscula
   const nomeFormatado = tecnicoNome.charAt(0).toUpperCase() + tecnicoNome.slice(1);
-  profileText.textContent = `Olá, ${tecnicoNome}`;
+  profileText.textContent = `Olá, ${nomeFormatado}`;
 }
 
-  // --- Modal / botões ---
+  // Modal / botões
   const agendaBtn = document.getElementById("agendaBtn");
   const agendaModal = document.getElementById("agendaModal");
   const adminBtn = document.getElementById("adminBtn");
@@ -50,8 +52,8 @@ if (profileText && tecnicoNome) {
         adminMsg.className = "msg sucesso";
         adminMsg.style.display = "block";
         
-      // 🔑 Marca sessão de admin
-      sessionStorage.setItem("adminLogado", "true");
+       //Marca sessão de admin
+       sessionStorage.setItem("adminLogado", "true");
 
         setTimeout(() => window.location.href = "relatorioAdmin.html", 1500);
       } else {
@@ -76,9 +78,13 @@ if (logoutBtn) {
   const statusSelect = document.getElementById("status");
   const prioridadeSelect = document.getElementById("prioridade");
   const responsavelSelect = document.getElementById("responsavel");
+  const callsContainer = document.querySelector(".calls");
 
-  // Pega os cards dinamicamente (NodeList estática aqui — se for adicionar/remover cards dinamicamente, re-obter)
-  const callCards = document.querySelectorAll(".call-card");
+  // Pega os cards dinamicamente
+  let callCards = [];
+  let statusChart = null;
+  let currentPage = 1;
+  const itemsPerPage = 5;
 
   function normalizeText(str) {
     if (!str) return "";
@@ -87,6 +93,55 @@ if (logoutBtn) {
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .trim();
+  }
+  
+   //Função para carregar chamados do backend
+  async function carregarChamados() {
+    try {
+      const baseUrl = "https://localhost:7202/api";
+      const response = await api.get(`${baseUrl}/chamado/${codigoChamado}`); // endpoint da API
+      renderChamados(response.data);
+    } catch (error) {
+      console.error("Erro ao carregar chamados:", error);
+      callsContainer.innerHTML = `<p style="color:red; text-align:center;">Erro ao carregar chamados.</p>`;
+    }
+  }
+
+  // Renderizar cards dinamicamente 
+  function renderChamados(chamados) {
+    callsContainer.innerHTML = "";
+
+    chamados.forEach(chamado => {
+      const card = document.createElement("div");
+      card.classList.add("call-card");
+      card.dataset.id = chamado.id;
+
+      card.innerHTML = `
+        <p><strong>Cód: #${chamado.id}</strong> - ${chamado.titulo}</p>
+        <p>${chamado.responsavel || "IA"} - ${new Date(chamado.dataCriacao).toLocaleString()}</p>
+        <div class="info-line">
+          <span class="priority ${chamado.prioridade?.toLowerCase() || "baixa"}">
+            <i class="fa-solid fa-chart-simple"></i>${chamado.prioridade || "Baixa"}
+          </span>
+          <span class="status ${chamado.status?.toLowerCase() || "aberto"}">
+            <i class="fa-solid fa-gauge"></i>${chamado.status || "Aberto"}
+          </span>
+        </div>
+      `;
+
+      // redireciona ao clicar
+      card.addEventListener("click", () => {
+        const codigo = chamado.id;
+        sessionStorage.setItem("usuarioTipo", "tecnico");
+        window.location.href = `chamado.html?codigo=${encodeURIComponent(codigo)}`;
+      });
+
+      callsContainer.appendChild(card);
+    });
+
+    callCards = document.querySelectorAll(".call-card");
+    showPage(); // reinicia a paginação
+    updateChart();
   }
 
   // Função de filtro (aplica pesquisa + selects) ---
@@ -131,31 +186,15 @@ if (logoutBtn) {
   if (prioridadeSelect) prioridadeSelect.addEventListener("change", aplicarFiltros);
   if (responsavelSelect) responsavelSelect.addEventListener("change", aplicarFiltros);
 
-  // Chart.js: contadores a partir dos cards visíveis
-  let statusChart = null;
-
   // Função que conta status dos cards (somente os visíveis)
   function countStatusesFromCards() {
     const counts = { aberto: 0, andamento: 0, fechado: 0, atrasado: 0 };
-
     callCards.forEach(card => {
-      // ignora cards escondidos
       if (getComputedStyle(card).display === "none") return;
-
       const statusEl = card.querySelector(".status");
-      let key = "";
-      if (statusEl) {
-        // tenta usar a classe (ex: 'andamento'), se não existir usa o texto
-        key = normalizeText(statusEl.classList[1] || statusEl.innerText || "");
-      } else {
-        key = "";
-      }
-
-      if (key in counts) {
-        counts[key]++;
-      }
+      const key = normalizeText(statusEl?.classList[1] || statusEl?.innerText || "");
+      if (key in counts) counts[key]++;
     });
-
     return counts;
   }
 
@@ -174,36 +213,27 @@ document.querySelectorAll(".call-card").forEach(card => {
 
   // Cria o gráfico (se Chart estiver carregado e canvas existir)
   function createChart() {
-    const canvas = document.getElementById('statusChart');
-    if (!canvas) {
-      console.warn("Canvas '#statusChart' não encontrado.");
-      return;
-    }
-    if (typeof Chart === 'undefined') {
-      console.error("Chart.js não encontrado. Verifique se o script do Chart.js está sendo carregado antes deste arquivo.");
-      return;
-    }
+    const canvas = document.getElementById("statusChart");
+    if (!canvas || typeof Chart === "undefined") return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const initial = countStatusesFromCards();
 
     statusChart = new Chart(ctx, {
-      type: 'doughnut',
+      type: "doughnut",
       data: {
-        labels: ['Aberto', 'Em andamento', 'Fechado', 'Atrasado'],
+        labels: ["Aberto", "Em andamento", "Fechado", "Atrasado"],
         datasets: [{
-          label: 'Chamados',
+          label: "Chamados",
           data: [initial.aberto, initial.andamento, initial.fechado, initial.atrasado],
-          backgroundColor: ['#007bff', '#ffc107', '#28a745', '#dc3545'],
+          backgroundColor: ["#007bff", "#ffc107", "#28a745", "#dc3545"],
           borderWidth: 0
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom' }
-        }
+        plugins: { legend: { position: "bottom" } }
       }
     });
   }
@@ -220,55 +250,50 @@ document.querySelectorAll(".call-card").forEach(card => {
   createChart();
 
   // PAGINAÇÃO 
-const callsContainer = document.querySelector(".calls");
-const cards = Array.from(document.querySelectorAll(".call-card"));
-const itemsPerPage = 5;
-let currentPage = 1;
+ function renderPagination() {
+    const totalPages = Math.ceil(callCards.length / itemsPerPage);
+    const pageNumbers = document.getElementById("pageNumbers");
+    if (!pageNumbers) return;
+    pageNumbers.innerHTML = "";
 
-function renderPagination() {
-  const totalPages = Math.ceil(cards.length / itemsPerPage);
-  const pageNumbers = document.getElementById("pageNumbers");
-  pageNumbers.innerHTML = "";
-
-  for (let i = 1; i <= totalPages; i++) {
-    const btn = document.createElement("button");
-    btn.textContent = i;
-    if (i === currentPage) btn.classList.add("active");
-    btn.addEventListener("click", () => {
-      currentPage = i;
-      showPage();
-    });
-    pageNumbers.appendChild(btn);
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement("button");
+      btn.textContent = i;
+      if (i === currentPage) btn.classList.add("active");
+      btn.addEventListener("click", () => {
+        currentPage = i;
+        showPage();
+      });
+      pageNumbers.appendChild(btn);
+    }
   }
-}
 
-function showPage() {
-  const start = (currentPage - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
+  function showPage() {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
 
-  cards.forEach((card, index) => {
-    card.style.display = (index >= start && index < end) ? "block" : "none";
+    callCards.forEach((card, index) => {
+      card.style.display = (index >= start && index < end) ? "block" : "none";
+    });
+
+    renderPagination();
+  }
+
+  document.getElementById("prevPage")?.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      showPage();
+    }
   });
 
-  renderPagination();
-}
+  document.getElementById("nextPage")?.addEventListener("click", () => {
+    const totalPages = Math.ceil(callCards.length / itemsPerPage);
+    if (currentPage < totalPages) {
+      currentPage++;
+      showPage();
+    }
+  });
 
-document.getElementById("prevPage").addEventListener("click", () => {
-  if (currentPage > 1) {
-    currentPage--;
-    showPage();
-  }
-});
-
-document.getElementById("nextPage").addEventListener("click", () => {
-  const totalPages = Math.ceil(cards.length / itemsPerPage);
-  if (currentPage < totalPages) {
-    currentPage++;
-    showPage();
-  }
-});
-
-// Inicializa
-showPage();
-
+  //  Inicialização 
+  carregarChamados(); //Chama o backend e carrega os chamados
 });
