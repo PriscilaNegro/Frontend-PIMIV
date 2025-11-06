@@ -65,8 +65,7 @@ if (pagina === "chamado.html") {
   async function carregarChamado() {
     try {
       const codigoChamado = codigo || codigoAtivo;
-      const baseUrl = "https://localhost:7202/api";
-      const response = await api.get(`${baseUrl}/chamado/protocolo/${codigoChamado}`);
+      const response = await api.get(`/chamado/protocolo/${codigoChamado}`);
       const chamado = response.data;
 
       const prioridades = {
@@ -112,7 +111,6 @@ if (pagina === "chamado.html") {
         document.getElementById("solucao-texto").textContent =
           chamado.solucao.descricao
       }
-
     } catch (error) {
       console.error("Erro ao buscar chamado:", error);
       alert("Erro ao carregar os dados do chamado. Tente novamente mais tarde.");

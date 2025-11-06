@@ -107,7 +107,7 @@ if (profileText && tecnicoNome) {
    //Função para carregar chamados do backend
   async function carregarChamados() {
     try {
-      const response = await api.get(`/chamado/${codigoChamado}`); // endpoint da API
+      const response = await api.get(`/chamado`); // endpoint da API
       renderChamados(response.data);
     } catch (error) {
       console.error("Erro ao carregar chamados:", error);
