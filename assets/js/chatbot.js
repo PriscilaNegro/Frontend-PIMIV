@@ -1,4 +1,4 @@
-import api from "./api.js";
+import {api} from "./api.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const chatCharacter = document.getElementById("chat-character");
@@ -40,15 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 800);
   }
 
-  function gerarProtocolo() {
-    const length = Math.floor(Math.random() * 3) + 4;
-    let protocolo = "";
-    for (let i = 0; i < length; i++) {
-      protocolo += Math.floor(Math.random() * 10);
-    }
-    return protocolo;
-  }
-
   // -- Funções de validação --
   function validarNome(nome) {
     const clean = nome.trim();
@@ -75,9 +66,9 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   }
 
-  async function enviarParaBackend(dados) {
+  async function enviarParaBackend(problema) {
   try {
-    const response = await api.post("/chatbot", dados);
+    const response = await api.post("/chat", { message: userData.problema });
     return response.data; // o backend deve retornar resposta: "texto da IA" 
   } catch (error) {
     console.error("Erro ao enviar para o backend:", error);
@@ -150,8 +141,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // Envia para o backend para tentar solução automática via IA
         botSay("Estou analisando seu problema, só um momento... 🤔", false);
 
-        enviarParaBackend(userData).then((res) => {
-          const respostaIA = res.resposta || "Não consegui encontrar uma solução imediata.";
+        enviarParaBackend(userData.problema).then((res) => {
+          const respostaIA = res.reply || "Não consegui encontrar uma solução imediata.";
 
           botSay(respostaIA, false);
 
@@ -333,6 +324,16 @@ document.addEventListener("DOMContentLoaded", () => {
         step = 0;
         setTimeout(() => startConversation(), 400);
       }
+    });
+  }
+
+  // Clique no logo -> 4Devs
+  const logo = document.querySelector('.logo, #logo');
+  if (logo) {
+    logo.style.cursor = 'pointer';
+    logo.addEventListener('click', () => {
+      const to4Devs = location.pathname.includes('/pages/') ? '../4devs.html' : './4devs.html';
+      window.location.href = to4Devs;
     });
   }
 });

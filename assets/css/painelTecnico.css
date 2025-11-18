@@ -155,7 +155,7 @@
 .priority.alta { background: rgb(179, 1, 1); }
 
 /* Status */
-.status.aberto { background: blue; }
+.status.aberto { background: rgb(0, 0, 255); }
 .status.andamento { background: rgb(242, 158, 1); }
 .status.fechado { background: green; }
 .status.atrasado { background: red; }

@@ -1,307 +1,356 @@
-import api from "./api.js";
+import {api} from "./api.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Verifica se é admin
+  const isAdmin = sessionStorage.getItem("isAdmin") === "true";
+  const tecnicoId = sessionStorage.getItem("tecnicoId");
 
-// Verifica se está logado
-//if (sessionStorage.getItem("logado") !== "true") {
- //window.location.href = "loginTecnico.html";
-//}
-
-// Exibir nome do técnico no sidebar
-const profileText = document.querySelector(".profile p");
-const tecnicoNome = sessionStorage.getItem("tecnicoNome");
-
-if (profileText && tecnicoNome) {
-  // Deixa a primeira letra maiúscula
-  const nomeFormatado = tecnicoNome.charAt(0).toUpperCase() + tecnicoNome.slice(1);
-  profileText.textContent = `Olá, ${nomeFormatado}`;
-}
-
-  // Modal / botões
-  const agendaBtn = document.getElementById("agendaBtn");
-  const agendaModal = document.getElementById("agendaModal");
-  const adminBtn = document.getElementById("adminBtn");
-  const adminModal = document.getElementById("adminModal");
-
-  document.querySelectorAll(".close").forEach(btn => {
-    btn.onclick = () => btn.parentElement.parentElement.style.display = "none";
-  });
-
-  if (agendaBtn && agendaModal) agendaBtn.onclick = () => agendaModal.style.display = "block";
-  if (adminBtn && adminModal) adminBtn.onclick = () => adminModal.style.display = "block";
-
-  // Fecha modal clicando fora
-  window.onclick = (e) => {
-    if (e.target.classList && e.target.classList.contains("modal")) {
-      e.target.style.display = "none";
+  // Exibir nome do técnico no sidebar
+  const profileText = document.querySelector(".profile p");
+  function exibirNomeTecnico() {
+    let n = localStorage.getItem("tecnicoNome");
+    if (n) {
+      const badge = isAdmin ? " 🗝️" : "";
+      profileText.textContent = `Olá, ${n.charAt(0).toUpperCase() + n.slice(1)}${badge}`;
     }
-  };
-
-  // Admin (senha)
-  const adminForm = document.getElementById("adminForm");
-  const adminMsg = document.getElementById("adminMsg");
-  if (adminForm) {
-  adminForm.onsubmit = async function(e) {
-    e.preventDefault();
-
-    const senha = document.getElementById("adminPassword").value;
-    adminMsg.textContent = "Verificando...";
-    adminMsg.className = "msg neutro";
-    adminMsg.style.display = "block";
-
-    try {
-      //Envia senha para o backend
-      const response = await api.post("/admin/validar", { senha });
-
-      if (response.data && response.data.isAdmin === true) {
-        sessionStorage.setItem("isAdmin", "true");
-        sessionStorage.setItem("adminLogado", "true");
-
-        adminMsg.textContent = "✅ Acesso liberado! Redirecionando...";
-        adminMsg.className = "msg sucesso";
-
-        setTimeout(() => window.location.href = "relatorioAdmin.html", 1500);
-      } else {
-        adminMsg.textContent = "❌ Acesso negado. Senha inválida.";
-        adminMsg.className = "msg erro";
-      }
-    } catch (error) {
-      console.error("Erro ao validar administrador:", error);
-      adminMsg.textContent = "⚠️ Erro na comunicação com o servidor.";
-      adminMsg.className = "msg erro";
-    }
-  };
-}
-
- // Logout
- const logoutBtn = document.querySelector(".logout");
-  if (logoutBtn) {
-    logoutBtn.onclick = () => {
-      sessionStorage.removeItem("logado"); // limpa a sessão
-      window.location.href = "loginTecnico.html"; // redireciona
-    };
   }
+  exibirNomeTecnico();
 
-  // Seletores (pesquisa + filtros + cards)
-  const searchInput = document.querySelector(".topbar input");
-  const statusSelect = document.getElementById("status");
-  const prioridadeSelect = document.getElementById("prioridade");
+  // Referências aos filtros
+  const searchInput       = document.querySelector(".topbar input");
+  const statusSelect      = document.getElementById("status");
+  const prioridadeSelect  = document.getElementById("prioridade");
   const responsavelSelect = document.getElementById("responsavel");
-  const callsContainer = document.querySelector(".calls");
+  const callsContainer    = document.querySelector(".calls");
 
-  // Pega os cards dinamicamente
-  let callCards = [];
-  let statusChart = null;
-  let currentPage = 1;
+  // Estado
+  let chamadosData = [];
+  let filteredData = [];
+  let currentPage  = 1;
   const itemsPerPage = 5;
+  let statusChart = null;
 
-  function normalizeText(str) {
-    if (!str) return "";
-    return str
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .trim();
-  }
-  
-   //Função para carregar chamados do backend
-  async function carregarChamados() {
+  // Mapeamento de prioridade (backend usa 0, 1, 2)
+  const prioridadeMap = {
+    "baixa": 0,
+    "media": 1,
+    "alta": 2
+  };
+  const prioridadeReverseMap = {
+    0: "baixa",
+    1: "media",
+    2: "alta"
+  };
+
+  // Mapeamento de status (backend usa 0, 1, 2, 3)
+  const statusMap = {
+    "aberto": 0,
+    "andamento": 1,
+    "fechado": 2,
+    "atrasado": 3
+  };
+  const statusReverseMap = {
+    0: "aberto",
+    1: "andamento",
+    2: "fechado",
+    3: "atrasado"
+  };
+  const statusColorMap = {
+    0: "#0000ff",   // aberto
+    1: "#f29e01",   // andamento
+    2: "#008000",   // fechado
+    3: "#ff0000"    // atrasado
+  };
+
+  // Carrega técnicos para o select (responsáveis)
+  async function carregarTecnicos() {
+    if (!responsavelSelect) return;
+    
     try {
-      const response = await api.get(`/chamado`); // endpoint da API
-      renderChamados(response.data);
-    } catch (error) {
-      console.error("Erro ao carregar chamados:", error);
-      callsContainer.innerHTML = `<p style="color:red; text-align:center;">Erro ao carregar chamados.</p>`;
+      if (!isAdmin) {
+        // Técnico comum: mostra apenas ele mesmo
+        const tecnicoNome = localStorage.getItem("tecnicoNome") || "Você";
+        responsavelSelect.innerHTML = `<option value="${tecnicoId}" selected>${tecnicoNome}</option>`;
+        responsavelSelect.disabled = true; // desabilita para evitar alteração
+        return;
+      }
+
+      // Admin: carrega todos os técnicos
+      console.log("Buscando técnicos...");
+      const resp = await api.get("/tecnico");
+      console.log("Resposta /tecnico:", resp.data);
+      const lista = Array.isArray(resp.data) ? resp.data : [];
+      responsavelSelect.innerHTML = `<option value="">Todos</option>` +
+        lista.map(t => {
+          const id = t.id || t.idTecnico;
+          const nome = t.nome || t.name || t.login || t.email || `Tec${id}`;
+          return `<option value="${id}">${nome}</option>`;
+        }).join("");
+    } catch (e) {
+      console.error("Falha ao carregar técnicos:", e);
     }
   }
 
-  // Renderizar cards dinamicamente 
-  function renderChamados(chamados) {
-    callsContainer.innerHTML = "";
+  // Normalizações simples - garante sempre string
+  function norm(v) { 
+    if (v === null || v === undefined) return "";
+    return String(v).toLowerCase().trim();
+  }
 
-    chamados.forEach(chamado => {
-      const card = document.createElement("div");
-      card.classList.add("call-card");
-      card.dataset.id = chamado.id;
+  // Decide rota ótima com base nos filtros individuais
+  async function carregarChamadosBackend() {
+    const statusTexto      = norm(statusSelect?.value);
+    const prioridadeTexto  = norm(prioridadeSelect?.value);
+    const responsavelId    = responsavelSelect?.value?.trim() || "";
 
-      card.innerHTML = `
-        <p><strong>Cód: #${chamado.id}</strong> - ${chamado.titulo}</p>
-        <p>${chamado.responsavel || "IA"} - ${new Date(chamado.dataCriacao).toLocaleString()}</p>
-        <div class="info-line">
-          <span class="priority ${chamado.prioridade?.toLowerCase() || "baixa"}">
-            <i class="fa-solid fa-chart-simple"></i>${chamado.prioridade || "Baixa"}
-          </span>
-          <span class="status ${chamado.status?.toLowerCase() || "aberto"}">
-            <i class="fa-solid fa-gauge"></i>${chamado.status || "Aberto"}
-          </span>
+    const statusNum = statusTexto ? statusMap[statusTexto] : null;
+    const prioridadeNum = prioridadeTexto ? prioridadeMap[prioridadeTexto] : null;
+
+    let url;
+    
+    // Se não for admin, força sempre usar o ID do técnico logado
+    const tecnicoFiltro = isAdmin ? responsavelId : tecnicoId;
+    
+    const filtrosAtivos = [statusNum !== null, prioridadeNum !== null, !!tecnicoFiltro].filter(Boolean).length;
+
+    if (filtrosAtivos === 0) {
+      // Admin sem filtros: todos / Técnico: sempre seus chamados
+      url = isAdmin ? "/chamado" : `/chamado/tecnico/${tecnicoId}`;
+    } else if (filtrosAtivos === 1) {
+      if (statusNum !== null && statusNum !== undefined) {
+        url = isAdmin 
+          ? `/chamado/status/${statusNum}` 
+          : `/chamado/tecnico/${tecnicoId}`;
+      }
+      if (prioridadeNum !== null && prioridadeNum !== undefined) {
+        url = isAdmin 
+          ? `/chamado/prioridade/${prioridadeNum}`
+          : `/chamado/tecnico/${tecnicoId}`;
+      }
+      if (tecnicoFiltro) {
+        url = `/chamado/tecnico/${encodeURIComponent(tecnicoFiltro)}`;
+      }
+    } else {
+      // Múltiplos filtros
+      url = isAdmin ? "/chamado" : `/chamado/tecnico/${tecnicoId}`;
+    }
+    
+    if (callsContainer) {
+      callsContainer.innerHTML = "<p>Carregando...</p>";
+    }
+    
+    try {
+      console.log("Buscando chamados em:", url);
+      const resp = await api.get(url);
+      console.log("Resposta chamados:", resp.data);
+      const dados = Array.isArray(resp.data) ? resp.data
+        : Array.isArray(resp.data?.items) ? resp.data.items
+        : Array.isArray(resp.data?.content) ? resp.data.content
+        : [];
+      console.log("Chamados processados:", dados.length);
+      chamadosData = dados;
+    } catch (e) {
+      console.error("Erro ao buscar chamados:", {
+        url,
+        status: e?.response?.status,
+        data: e?.response?.data,
+        msg: e?.message
+      });
+      chamadosData = [];
+      if (callsContainer) callsContainer.innerHTML = "<p>Erro ao carregar chamados.</p>";
+    }
+  }
+
+  // Aplica filtros locais (busca + combinação quando necessário)
+  function aplicarFiltrosLocais() {
+    const buscaTxt         = norm(searchInput?.value);
+    const statusTexto      = norm(statusSelect?.value);
+    const prioridadeTexto  = norm(prioridadeSelect?.value);
+    const responsavelId    = responsavelSelect?.value?.trim() || "";
+
+    const statusNum = statusTexto ? statusMap[statusTexto] : null;
+    const prioridadeNum = prioridadeTexto ? prioridadeMap[prioridadeTexto] : null;
+
+    filteredData = chamadosData.filter(c => {
+      const titulo = norm(c.titulo);
+      const protocolo = String(c.protocolo || c.idChamado || "").toLowerCase();
+      const statusCard = c.status;
+      const prioridadeCard = c.prioridade;
+      const tecnicoIdCard = String(c.tecnico?.id || c.idTecnico || c.tecnicoId || "");
+      const tecnicoNome = norm(c.tecnico?.nome || c.responsavel || c.nomeTecnico || "");
+
+      // Técnico comum: sempre filtra por seu próprio ID
+      if (!isAdmin && tecnicoIdCard !== tecnicoId) return false;
+
+      if (statusNum !== null && statusCard !== statusNum) return false;
+      if (prioridadeNum !== null && prioridadeCard !== prioridadeNum) return false;
+      if (responsavelId && tecnicoIdCard !== responsavelId) return false;
+
+      if (buscaTxt) {
+        if (!titulo.includes(buscaTxt) && !protocolo.includes(buscaTxt) && !tecnicoNome.includes(buscaTxt))
+          return false;
+      }
+      return true;
+    });
+    console.log("Filtrados:", filteredData.length);
+  }
+
+  // Renderização de cards + paginação
+  function renderChamados() {
+    if (!callsContainer) return;
+    if (!filteredData.length) {
+      callsContainer.innerHTML = "<p>Nenhum chamado encontrado.</p>";
+      updateChart();
+      renderPagination();
+      return;
+    }
+    const start = (currentPage - 1) * itemsPerPage;
+    const pageItems = filteredData.slice(start, start + itemsPerPage);
+
+    callsContainer.innerHTML = pageItems.map(c => {
+      const prioridadeTexto = prioridadeReverseMap[c.prioridade] || "baixa";
+      const statusTexto = statusReverseMap[c.status] || "aberto";
+
+      const prioridadeDisplay = prioridadeTexto.charAt(0).toUpperCase() + prioridadeTexto.slice(1);
+      const statusDisplay = statusTexto.charAt(0).toUpperCase() + statusTexto.slice(1);
+      const tecnicoRaw = c.tecnico?.nome || c.responsavel || c.nomeTecnico || "Não atribuído";
+      const tecnicoFmt = tecnicoRaw.charAt(0).toUpperCase() + tecnicoRaw.slice(1);
+      const dataFmt = c.dataAbertura
+        ? new Date(c.dataAbertura).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})
+        : "Sem data";
+
+      return `
+        <div class="call-card" data-id="${c.idChamado || c.id}" data-protocolo="${c.protocolo || c.idChamado || c.id}">
+          <p><strong>Cód: #${c.protocolo || c.idChamado || c.id}</strong> - ${c.titulo || "Sem título"}</p>
+          <p>${tecnicoFmt} - ${dataFmt}</p>
+          <div class="info-line">
+            <span class="priority ${prioridadeTexto}">
+              <i class="fa-solid fa-chart-simple"></i>${prioridadeDisplay}
+            </span>
+            <span class="status ${statusTexto}">
+              <i class="fa-solid fa-gauge"></i>${statusDisplay}
+            </span>
+          </div>
         </div>
       `;
+    }).join("");
 
-      // redireciona ao clicar
+    const callCards = callsContainer.querySelectorAll(".call-card");
+    callCards.forEach(card => {
       card.addEventListener("click", () => {
-        const codigo = chamado.id;
+        const codigo = card.dataset.protocolo;
         sessionStorage.setItem("usuarioTipo", "tecnico");
         window.location.href = `chamado.html?codigo=${encodeURIComponent(codigo)}`;
       });
-
-      callsContainer.appendChild(card);
     });
 
-    callCards = document.querySelectorAll(".call-card");
-    showPage(); // reinicia a paginação
     updateChart();
+    renderPagination();
   }
 
-  // Função de filtro (aplica pesquisa + selects) ---
-  function aplicarFiltros() {
-    const searchText = normalizeText(searchInput?.value || "");
-    const status = normalizeText(statusSelect?.value || "");
-    const prioridade = normalizeText(prioridadeSelect?.value || "");
-    const responsavel = normalizeText(responsavelSelect?.value || "");
+  // Gráfico (status visíveis)
+  function updateChart() {
+    const baseCodes = [0,1,2,3];
+    const countsByCode = {0:0,1:0,2:0,3:0};
 
-    callCards.forEach(card => {
-      const cardText = normalizeText(card.innerText || "");
-      // Preferimos usar a segunda classe do elemento .status (ex: <span class="status andamento">Em andamento</span>)
-      const statusEl = card.querySelector(".status");
-      const cardStatusClass = statusEl ? normalizeText(statusEl.classList[1] || "") : normalizeText(statusEl?.innerText || "");
-      const prioridadeEl = card.querySelector(".priority");
-      const cardPrioridadeClass = prioridadeEl ? normalizeText(prioridadeEl.classList[1] || "") : normalizeText(prioridadeEl?.innerText || "");
-
-      let mostrar = true;
-
-      // pesquisa por texto
-      if (searchText && !cardText.includes(searchText)) mostrar = false;
-
-      // status (compara classe ex: 'aberto' / 'andamento' / 'fechado')
-      if (status && cardStatusClass !== status) mostrar = false;
-
-      // prioridade (compara classe ex: 'baixa' / 'media' / 'alta')
-      if (prioridade && cardPrioridadeClass !== prioridade) mostrar = false;
-
-      // responsavel (procura o nome no texto do card)
-      if (responsavel && !cardText.includes(responsavel)) mostrar = false;
-
-      card.style.display = mostrar ? "block" : "none";
+    filteredData.forEach(c => {
+      const code = typeof c.status === "number" ? c.status : statusMap[String(c.status).toLowerCase()] ?? 0;
+      if (countsByCode[code] !== undefined) countsByCode[code] += 1;
     });
 
-    // após filtrar, atualiza o gráfico para refletir os cards visíveis
-    updateChart();
-  }
-
-  // Eventos
-  if (searchInput) searchInput.addEventListener("input", aplicarFiltros);
-  if (statusSelect) statusSelect.addEventListener("change", aplicarFiltros);
-  if (prioridadeSelect) prioridadeSelect.addEventListener("change", aplicarFiltros);
-  if (responsavelSelect) responsavelSelect.addEventListener("change", aplicarFiltros);
-
-  // Função que conta status dos cards (somente os visíveis)
-  function countStatusesFromCards() {
-    const counts = { aberto: 0, andamento: 0, fechado: 0, atrasado: 0 };
-    callCards.forEach(card => {
-      if (getComputedStyle(card).display === "none") return;
-      const statusEl = card.querySelector(".status");
-      const key = normalizeText(statusEl?.classList[1] || statusEl?.innerText || "");
-      if (key in counts) counts[key]++;
+    const activeCodes = baseCodes.filter(code => countsByCode[code] > 0);
+    const labels = activeCodes.map(code => {
+      const txt = statusReverseMap[code];
+      return txt.charAt(0).toUpperCase() + txt.slice(1);
     });
-    return counts;
-  }
+    const data = activeCodes.map(code => countsByCode[code]);
+    const colors = activeCodes.map(code => statusColorMap[code]);
 
-  // Torna os cards clicáveis e envia o técnico para a página de acompanhamento
-document.querySelectorAll(".call-card").forEach(card => {
-  card.addEventListener("click", () => {
-    const codigo = card.dataset.id;
-     if (codigo) {
-      // Salva sessão como técnico logado
-      sessionStorage.setItem("usuarioTipo", "tecnico");
-      // Redireciona para acompanhamento com código
-      window.location.href = `chamado.html?codigo=${encodeURIComponent(codigo)}`;
-    }
-  });
-});
-
-  // Cria o gráfico (se Chart estiver carregado e canvas existir)
-  function createChart() {
-    const canvas = document.getElementById("statusChart");
-    if (!canvas || typeof Chart === "undefined") return;
-
-    const ctx = canvas.getContext("2d");
-    const initial = countStatusesFromCards();
+    const ctx = document.getElementById("statusChart");
+    if (!ctx) return;
+    if (statusChart) statusChart.destroy();
 
     statusChart = new Chart(ctx, {
       type: "doughnut",
       data: {
-        labels: ["Aberto", "Em andamento", "Fechado", "Atrasado"],
+        labels,
         datasets: [{
-          label: "Chamados",
-          data: [initial.aberto, initial.andamento, initial.fechado, initial.atrasado],
-          backgroundColor: ["#007bff", "#ffc107", "#28a745", "#dc3545"],
+          data,
+          backgroundColor: colors,
           borderWidth: 0
         }]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { position: "bottom" } }
+        plugins: { legend: { position: "bottom" } },
+        cutout: "55%"
       }
     });
   }
 
-  // Atualiza dados do gráfico
-  function updateChart() {
-    if (!statusChart) return;
-    const counts = countStatusesFromCards();
-    statusChart.data.datasets[0].data = [counts.aberto, counts.andamento, counts.fechado, counts.atrasado];
-    statusChart.update();
+  // Paginação
+  function renderPagination() {
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
+    const pagEl = document.getElementById("pagination-info");
+    if (pagEl) pagEl.textContent = `Página ${currentPage} de ${totalPages}`;
+    const prevBtn = document.getElementById("prevPage");
+    const nextBtn = document.getElementById("nextPage");
+    if (prevBtn) prevBtn.disabled = currentPage <= 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
   }
-
-  // inicializa o gráfico
-  createChart();
-
-  // PAGINAÇÃO 
- function renderPagination() {
-    const totalPages = Math.ceil(callCards.length / itemsPerPage);
-    const pageNumbers = document.getElementById("pageNumbers");
-    if (!pageNumbers) return;
-    pageNumbers.innerHTML = "";
-
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement("button");
-      btn.textContent = i;
-      if (i === currentPage) btn.classList.add("active");
-      btn.addEventListener("click", () => {
-        currentPage = i;
-        showPage();
-      });
-      pageNumbers.appendChild(btn);
-    }
-  }
-
-  function showPage() {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-
-    callCards.forEach((card, index) => {
-      card.style.display = (index >= start && index < end) ? "block" : "none";
-    });
-
-    renderPagination();
-  }
-
   document.getElementById("prevPage")?.addEventListener("click", () => {
     if (currentPage > 1) {
       currentPage--;
-      showPage();
+      renderChamados();
     }
   });
-
   document.getElementById("nextPage")?.addEventListener("click", () => {
-    const totalPages = Math.ceil(callCards.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     if (currentPage < totalPages) {
       currentPage++;
-      showPage();
+      renderChamados();
     }
   });
 
-  //  Inicialização 
-  carregarChamados(); //Chama o backend e carrega os chamados
+  // Ciclo principal de atualização
+  async function atualizarLista() {
+    currentPage = 1;
+    await carregarChamadosBackend();
+    aplicarFiltrosLocais();
+    renderChamados();
+  }
+
+  // Eventos de filtros
+  statusSelect?.addEventListener("change", atualizarLista);
+  prioridadeSelect?.addEventListener("change", atualizarLista);
+  responsavelSelect?.addEventListener("change", atualizarLista);
+  if (searchInput) {
+    let debounce;
+    searchInput.addEventListener("input", () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(() => {
+        aplicarFiltrosLocais();
+        currentPage = 1;
+        renderChamados();
+      }, 300);
+    });
+  }
+
+  // Inicialização
+  carregarTecnicos();
+  atualizarLista();
+
+    // Logout
+  const btnSair = document.getElementById("logout") || document.querySelector(".logout") || document.getElementById("logout");
+  if (btnSair) {
+    btnSair.addEventListener("click", (e) => {
+      e.preventDefault();
+      // Limpa dados do session/localStorage
+      sessionStorage.clear();
+      localStorage.removeItem("tecnicoNome");
+      localStorage.removeItem("tecnicoId");
+      // Redireciona para login
+      window.location.href = "loginTecnico.html";
+    });
+  }
 });

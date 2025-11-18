@@ -1,4 +1,4 @@
-import api from "./api.js";
+import {api} from "./api.js";
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -34,8 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         // Envia a requisição ao backend
-        const baseUrl = "https://localhost:7202/api";
-        const response = await api.post(`${baseUrl}/tecnico/login`, {
+        const response = await api.post("/tecnico/login", {
           email: usuario,
           senha: senha
         });
@@ -43,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = response.data;
 
         // Salva as informações de sessão
-        localStorage.setItem('token', data.token);
         localStorage.setItem('tecnicoNome', data.nome);
         localStorage.setItem('tecnicoEmail', data.email);
         localStorage.setItem('usuarioTipo', 'tecnico');
@@ -51,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
         sucesso.textContent = '✅ Login realizado com sucesso!';
         sucesso.style.display = 'block';
 
+        sessionStorage.setItem("tecnicoId", data.id);
+        sessionStorage.setItem("isAdmin", data.administrador ? "true" : "false");
+        
         // Redireciona após 1 segundo
         setTimeout(() => {
           window.location.href = 'painelTecnico.html';
@@ -132,4 +133,14 @@ document.addEventListener('DOMContentLoaded', () => {
       btnOk.style.display = "none";
   });
  }
+
+   // Clique no logo -> 4Devs
+  const logo = document.querySelector('.logo, #logo');
+  if (logo) {
+    logo.style.cursor = 'pointer';
+    logo.addEventListener('click', () => {
+      const to4Devs = location.pathname.includes('/pages/') ? '../4devs.html' : './4devs.html';
+      window.location.href = to4Devs;
+    });
+  }
 });

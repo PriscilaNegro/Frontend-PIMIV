@@ -58,71 +58,18 @@
       <label for="responsavel"><i class="fa-solid fa-user"></i> Responsável:</label>
        <select id="responsavel">
         <option value="">Todos</option>
-        <option value="joao">João</option>
-        <option value="maria">Maria</option>
-        <option value="ana">Ana</option>
     </select>
     </div>
 
-      <!-- Lista de chamados -->
+    <!-- Lista de chamados -->
       <section class="calls">
-        <div class="call-card" data-id="3333">
-          <p><strong>Cód: #3333</strong> - Sem acesso ao sistema</p>
-          <p>Maria - 01/08/2025 15:32</p>
-            <div class="info-line">
-              <span class="priority alta"><i class="fa-solid fa-chart-simple"></i>Alta</span>
-              <span class="status andamento"><i class="fa-solid fa-gauge"></i>Em andamento</span>
-            </div>
-        </div>
-        <!--
-        <div class="call-card" data-id="6481">
-          <p><strong>Cód: #6481</strong> - Impressora não funciona</p>
-          <p>João - 03/08/2025 11:48</p>
-          <div class="info-line">
-              <span class="priority baixa"><i class="fa-solid fa-chart-simple"></i>Baixa</span>
-              <span class="status atrasado"><i class="fa-solid fa-gauge"></i>Atrasado</span>
-           </div>
-        </div>
-
-        <div class="call-card" data-id="1235">
-          <p><strong>Cód: #1235</strong> - Sugestão de melhoria</p>
-          <p>Ana - 04/08/2025 17:28</p>
-            <div class="info-line">
-              <span class="priority baixa"><i class="fa-solid fa-chart-simple"></i>Baixa</span>
-              <span class="status aberto"><i class="fa-solid fa-gauge"></i>Aberto</span>
-           </div>
-        </div>
-
-        <div class="call-card" data-id="13654">
-          <p><strong>Cód: #13654</strong> - Relatório para cliente</p>
-          <p>Maria - 06/08/2025 18:01</p>
-            <div class="info-line">
-              <span class="priority media"><i class="fa-solid fa-chart-simple"></i>Média</span>
-              <span class="status andamento"><i class="fa-solid fa-gauge"></i>Em andamento</span>
-             </div>
-        </div>
-
-        <div class="call-card" data-id="7895">
-          <p><strong>Cód: #7895</strong> - Impressora não imprime cupom</p>
-          <p>João - 07/08/2025 15:30</p>
-            <div class="info-line">
-              <span class="priority media"><i class="fa-solid fa-chart-simple"></i>Média</span>
-              <span class="status fechado"><i class="fa-solid fa-gauge"></i>Fechado</span>
-            </div>
-        </div>
-
-        <div class="call-card" data-id="2657">
-          <p><strong>Cód: #2657</strong> - Sistema não abre</p>
-          <p>Ana - 09/08/2025 11:40</p>
-            <div class="info-line">
-              <span class="priority alta"><i class="fa-solid fa-chart-simple"></i>Alta</span>
-              <span class="status fechado"><i class="fa-solid fa-gauge"></i>Fechado</span>
-            </div>
-        </div> -->
+        <!-- Os cards virão dinamicamente do JS -->
+        <p>Carregando chamados...</p>
+      </section>
 
         <div class="pagination">
           <button id="prevPage">«</button>
-          <span id="pageNumbers"></span>
+          <span id="pagination-info"></span>
           <button id="nextPage">»</button>
         </div>
       </section>

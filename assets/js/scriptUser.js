@@ -1,6 +1,5 @@
-import api from "./api.js";
+import {api} from "./api.js";
 
-// Detecta qual página está aberta pelo nome do arquivo
 const pagina = window.location.pathname.split("/").pop();
 
 // Página inicial (index.html)
@@ -13,8 +12,6 @@ if (pagina === "index.html") {
     form.addEventListener("submit", function(event) {
       event.preventDefault();
       const codigo = input.value.trim();
-
-      // Regex para validar: somente números, 4 a 6 dígitos
       const regex = /^\d{4,6}$/;
 
       if (!regex.test(codigo)) {
@@ -23,11 +20,8 @@ if (pagina === "index.html") {
         return;
       }
 
-      erro.style.display = "none"; // limpa mensagem
-      
-      // Marca que o chamado está ativo
+      erro.style.display = "none";
       sessionStorage.setItem("chamadoAtivo", codigo);
-
       sessionStorage.setItem("usuarioTipo", "cliente");
       window.location.href = `chamado.html?codigo=${encodeURIComponent(codigo)}`;
     });
@@ -45,143 +39,231 @@ if (pagina === "index.html") {
 
 // Página de acompanhamento (chamado.html)
 if (pagina === "chamado.html") {
-  const usuarioTipo = sessionStorage.getItem("usuarioTipo"); // técnico ou cliente
+  const usuarioTipo = sessionStorage.getItem("usuarioTipo");
   const codigoAtivo = sessionStorage.getItem("chamadoAtivo");
   const params = new URLSearchParams(window.location.search);
   const codigo = params.get("codigo");
 
-  // Se for cliente e não tiver chamado ativo (redireciona)
+  let chamadoAtual = null; // armazena dados do chamado
+
   if (usuarioTipo !== "tecnico" && !codigoAtivo) {
     window.location.href = "index.html";
   }
 
-  // Exibe o código do chamado na tela
-  if (codigo) {
-    const display = document.getElementById("codigo");
-    if (display) display.textContent = `#${codigo}`;
+  // Normaliza solução para sempre ter { id, descricao }
+  function normalizeSolucao(sol) {
+    if (!sol) return null;
+    return {
+      id: sol.id ?? sol.idSolucao ?? sol.codigo ?? null,
+      descricao: sol.descricao ?? sol.texto ?? ""
+    };
   }
 
-  //Busca os dados do chamado no backend e exibe nos elementos HTML existentes
+  function setSolucaoIdOnElement(id) {
+    const el = document.getElementById("solucao-texto");
+    if (el) {
+      if (id) el.dataset.solucaoId = String(id);
+      else delete el.dataset.solucaoId;
+    }
+  }
+
   async function carregarChamado() {
     try {
       const codigoChamado = codigo || codigoAtivo;
+      if (!codigoChamado) {
+        alert("Código do chamado não encontrado.");
+        window.location.href = usuarioTipo === "tecnico" ? "painelTecnico.html" : "index.html";
+        return;
+      }
+
       const response = await api.get(`/chamado/protocolo/${codigoChamado}`);
-      const chamado = response.data;
+      chamadoAtual = response.data;
 
-      const prioridades = {
-        0: "Baixa",
-        1: "Média",
-        2: "Alta"
-      };
+      // Normaliza solução e aplica no DOM
+      chamadoAtual.solucao = normalizeSolucao(chamadoAtual.solucao);
+      const solucaoTexto = document.getElementById("solucao-texto");
+      if (solucaoTexto) {
+        solucaoTexto.textContent = chamadoAtual.solucao?.descricao || "Solução ainda não registrada.";
+        setSolucaoIdOnElement(chamadoAtual.solucao?.id);
+      }
 
-      const status = {
-        0: "Aberto",
-        1: "Em Andamento",
-        2: "Fechado"
-      };
+      const prioridades = { 0: "Baixa", 1: "Média", 2: "Alta" };
+      const status = { 0: "Aberto", 1: "Em Andamento", 2: "Fechado", 3: "Atrasado" };
 
-      const dataAbertura = chamado.dataAbertura
-      ? new Date(chamado.dataAbertura)
-      : null;
+      const dataAbertura = chamadoAtual.dataAbertura ? new Date(chamadoAtual.dataAbertura) : null;
 
-      // Atualiza os elementos da tela com as informações do chamado
-      document.getElementById("status").textContent =
-        status[chamado.status] || "Desconhecido";
-      document.getElementById("descricao").textContent =
-        chamado.descricao;
+      const display = document.getElementById("codigo");
+      if (display) display.textContent = `#${chamadoAtual.protocolo || codigoChamado}`;
+
+      document.getElementById("status").textContent = status[chamadoAtual.status] || "Desconhecido";
+      document.getElementById("descricao").textContent = chamadoAtual.descricao;
       document.getElementById("data-abertura").textContent = 
-        chamado.dataAbertura? dataAbertura.toLocaleDateString("pt-BR") : "Não informada";
-      document.getElementById("assunto").textContent =
-        chamado.titulo;
-      document.getElementById("prioridade").textContent =
-        prioridades[chamado.prioridade] || "Não informada";
-      document.getElementById("solicitante").textContent =
-        chamado.usuario.nome;
-      document.getElementById("telefone").textContent =
-        chamado.usuario.telefone;
-      document.getElementById("email").textContent =
-        chamado.usuario.email;
-      document.getElementById("tecnico").textContent =
-        chamado.tecnico.nome;
+        dataAbertura ? dataAbertura.toLocaleDateString("pt-BR") : "Não informada";
+      document.getElementById("assunto").textContent = chamadoAtual.titulo;
+      document.getElementById("prioridade").textContent = prioridades[chamadoAtual.prioridade] || "Não informada";
+      document.getElementById("solicitante").textContent = chamadoAtual.usuario.nome;
+      document.getElementById("telefone").textContent = chamadoAtual.usuario.telefone;
+      document.getElementById("email").textContent = chamadoAtual.usuario.email;
+      document.getElementById("tecnico").textContent = chamadoAtual.tecnico?.nome || "Não atribuído";
       
-      if (chamado.solucao == null ){
-        document.getElementById("solucao-texto").textContent =
-          "Solução ainda não registrada.";
-      } else {
-        document.getElementById("solucao-texto").textContent =
-          chamado.solucao.descricao
+      if (usuarioTipo === "tecnico") {
+        mostrarBotoesEdicao();
       }
     } catch (error) {
-      console.error("Erro ao buscar chamado:", error);
-      alert("Erro ao carregar os dados do chamado. Tente novamente mais tarde.");
+      console.error("Erro ao buscar chamado:", error?.response || error);
+      showFeedback("Falha ao carregar dados do chamado.", "erro");
     }
   }
 
-  // Carrega as informações assim que a página abrir
-  carregarChamado();
+  function mostrarBotoesEdicao() {
+    const botoesTecnico = document.getElementById("botoes-tecnico");
+    if (botoesTecnico) {
+      botoesTecnico.style.display = "flex";
+    }
+  }
 
-  // Exibe botões Editar/Salvar apenas para o técnico 
-  const solucaoCampo = document.getElementById("solucao-texto");
+  // Botão Editar: torna o campo editável
+  let solucaoCampo = document.getElementById("solucao-texto");
   const btnEditar = document.getElementById("btnEditar");
   const btnSalvar = document.getElementById("btnSalvar");
-  const botoesTecnico = document.getElementById("botoes-tecnico");
-
-  if (usuarioTipo === "tecnico" && botoesTecnico) {
-    botoesTecnico.style.display = "flex"; // mostra os botões
-  }
-
-   // Exibe a solução salva (caso exista) 
-  if (solucaoCampo) {
-    const codigoChamado = codigo || codigoAtivo;
-    const solucaoSalva = sessionStorage.getItem(`solucao_${codigoChamado}`);
-    if (solucaoSalva) {
-      solucaoCampo.value = solucaoSalva;
-    }
-  }
 
   if (btnEditar && btnSalvar && solucaoCampo) {
     btnEditar.addEventListener("click", () => {
+      // Mantém o estilo e apenas troca para textarea preservando o data-solucao-id
+      if (solucaoCampo.tagName !== "TEXTAREA") {
+        const textarea = document.createElement("textarea");
+        textarea.id = "solucao-texto";
+        textarea.className = solucaoCampo.className;
+        textarea.value = solucaoCampo.textContent;
+        textarea.rows = 5;
+        // preserva o id da solução
+        if (solucaoCampo.dataset.solucaoId) {
+          textarea.dataset.solucaoId = solucaoCampo.dataset.solucaoId;
+        }
+        solucaoCampo.parentNode.replaceChild(textarea, solucaoCampo);
+        solucaoCampo = textarea;
+      }
+
       solucaoCampo.removeAttribute("readonly");
       solucaoCampo.focus();
       btnEditar.style.display = "none";
       btnSalvar.style.display = "inline-block";
     });
 
+    // Substitui alerts por mensagem discreta abaixo da solução (sem alterar layout / botões)
+    function showFeedback(msg, tipo = "ok") {
+      let msgEl = document.getElementById("solucaoMsg");
+      if (!msgEl) {
+        msgEl = document.createElement("span");
+        msgEl.id = "solucaoMsg";
+        msgEl.style.display = "block";
+        msgEl.style.marginTop = "6px";
+        msgEl.style.fontSize = ".8rem";
+        msgEl.style.fontWeight = "500";
+        // Insere logo após o texto da solução
+        const solucaoEl = document.getElementById("solucao-texto");
+        solucaoEl?.parentElement?.insertBefore(msgEl, solucaoEl.nextSibling);
+      }
+      msgEl.textContent = msg;
+      // Estilo mínimo sem mexer no layout existente
+      if (tipo === "ok") {
+        msgEl.style.color = "#1f7a31";
+      } else {
+        msgEl.style.color = "#a12626";
+      }
+      // Fade automático após alguns segundos (opcional)
+      clearTimeout(msgEl._fadeTimer);
+      msgEl.style.opacity = "1";
+      msgEl._fadeTimer = setTimeout(() => {
+        msgEl.style.transition = "opacity .6s";
+        msgEl.style.opacity = "0";
+      }, 4000);
+    }
+
+    // Ajuste no salvar (remover alert e usar showFeedback)
     btnSalvar.addEventListener("click", async () => {
-      const texto = solucaoCampo.value.trim();
-      if (texto === "") {
-        alert("Digite uma solução antes de salvar.");
+      const campo = document.getElementById("solucao-texto");
+      const textoSolucao = (campo.tagName === "TEXTAREA" ? campo.value : campo.textContent).trim();
+
+      if (!textoSolucao) {
+        showFeedback("Digite uma solução antes de salvar.", "erro");
+        return;
+      }
+      if (!chamadoAtual?.idChamado && !chamadoAtual?.id) {
+        showFeedback("ID do chamado não identificado.", "erro");
         return;
       }
 
-     // Salva localmente no sessionStorage 
-      const codigoChamado = codigo || codigoAtivo; 
-      
-     // Chamada para o Backend
       try {
-        const response = await api.get(`${baseUrl}/api/solucao`);
+        const idChamado = chamadoAtual.idChamado || chamadoAtual.id;
 
-        console.log("Resposta do servidor:", response.data);
+        // Tenta obter o id da solução
+        let idSolucao =
+          campo.dataset.solucaoId ||
+          chamadoAtual.solucao?.id ||
+          chamadoAtual.solucao?.idSolucao ||
+          null;
 
-        // Se der tudo certo no backend, também salva localmente
-        sessionStorage.setItem(`solucao_${codigoChamado}`, texto);
+        console.log("DEBUG:", { idChamado, idSolucao, textoSolucao });
 
-        alert("Solução salva com sucesso!");}
-        catch (error){
-          console.error("Erro ao salvar solução:", error);
-          alert("Ocorreu um erro ao salvar a sulução")
+        if (idSolucao) {
+          // PATCH: id como query param, body é string direta
+          console.log(`PATCH /solucao?id=${idSolucao}`);
+          const resp = await api.patch(`/solucao?id=${idSolucao}`,
+            JSON.stringify(textoSolucao),
+            { headers: { 'Content-Type': 'application/json' } }
+          );
+          console.log("Resposta PATCH:", resp.data);
+        } else {
+          // POST: mantém objeto { idChamado, descricao }
+          console.log("POST /solucao");
+          const resp = await api.post(`/solucao`, { 
+            idChamado: Number(idChamado), 
+            descricao: textoSolucao 
+          });
+          console.log("Resposta POST:", resp.data);
+          
+          idSolucao = resp.data?.id || resp.data?.idSolucao || null;
+          console.log("ID criado:", idSolucao);
         }
-     
-      solucaoCampo.setAttribute("readonly", true);
-      btnSalvar.style.display = "none";
-      btnEditar.style.display = "inline-block";
+
+        // Atualiza estado
+        if (!chamadoAtual.solucao) chamadoAtual.solucao = {};
+        chamadoAtual.solucao.id = idSolucao;
+        chamadoAtual.solucao.descricao = textoSolucao;
+
+        // Volta para <p>
+        let novoEl = document.getElementById("solucao-texto");
+        if (novoEl.tagName === "TEXTAREA") {
+          const p = document.createElement("p");
+          p.id = "solucao-texto";
+          p.className = novoEl.className;
+          p.textContent = textoSolucao;
+          if (idSolucao) p.dataset.solucaoId = String(idSolucao);
+          novoEl.parentNode.replaceChild(p, novoEl);
+        } else {
+          novoEl.textContent = textoSolucao;
+          if (idSolucao) novoEl.dataset.solucaoId = String(idSolucao);
+        }
+
+        btnSalvar.style.display = "none";
+        btnEditar.style.display = "inline-block";
+        showFeedback("Solução salva com sucesso.", "ok");
+        
+      } catch (error) {
+        console.error("ERRO:", error?.response?.data || error?.message);
+        showFeedback(`Erro: ${error?.response?.data?.message || error?.message || 'Falha'}`, "erro");
+      }
     });
   }
 
-  // Botão sair (comportamento muda conforme tipo de usuário)
-  const btnSair = document.querySelector(".btn-sair");
-  if (btnSair) {
-    btnSair.addEventListener("click", () => {
+  // Carrega chamado ao abrir página
+  carregarChamado();
+
+  // Botão sair
+  const btnSairPagina = document.querySelector(".btn-sair");
+  if (btnSairPagina) {
+    btnSairPagina.addEventListener("click", () => {
       if (usuarioTipo === "tecnico") {
         sessionStorage.removeItem("usuarioTipo");
         window.location.href = "painelTecnico.html";
