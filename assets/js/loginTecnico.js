@@ -20,14 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Validação básica
       if (!usuario || !senha) {
-        erro.textContent = '❌ Preencha todos os campos!';
+        erro.textContent = 'Preencha todos os campos!';
         erro.style.display = 'block';
         return;
       }
 
       if (!dominioValido.test(usuario)) {
         erro.style.display = 'block';
-        erro.textContent = '❌ E-mail inválido!';
+        erro.textContent = 'E-mail inválido!';
         sucesso.style.display = 'none';
         return;
       }
@@ -46,16 +46,16 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('tecnicoEmail', data.email);
         localStorage.setItem('usuarioTipo', 'tecnico');
 
-        sucesso.textContent = '✅ Login realizado com sucesso!';
+        //sucesso.textContent = 'Login realizado com sucesso!';
         sucesso.style.display = 'block';
 
         sessionStorage.setItem("tecnicoId", data.id);
-        sessionStorage.setItem("isAdmin", data.administrador ? "true" : "false");
+        sessionStorage.setItem("isAdmin", data.administrador);
         
         // Redireciona após 1 segundo
-        setTimeout(() => {
-          window.location.href = 'painelTecnico.html';
-        }, 1000);
+        //setTimeout(() => {
+         window.location.href = 'painelTecnico.html';
+        //}, 1000);
 
       } catch (error) {
         console.error('Erro ao conectar com o servidor:', error);
@@ -64,9 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
       // Exibe erro adequado conforme resposta do servidor
       if (error.response && error.response.status === 401) {
-        erro.textContent = '❌ Usuário ou senha incorretos!';
+        erro.textContent = 'Usuário ou senha incorretos!';
       } else {
-        erro.textContent = '❌ Erro ao conectar com o servidor!';
+        erro.textContent = 'Erro ao conectar com o servidor!';
       }
     }
   });

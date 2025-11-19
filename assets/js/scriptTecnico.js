@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Verifica se é admin
   const isAdmin = sessionStorage.getItem("isAdmin") === "true";
   const tecnicoId = sessionStorage.getItem("tecnicoId");
+  console.log("tecnicoId:", tecnicoId);
 
   // Exibir nome do técnico no sidebar
   const profileText = document.querySelector(".profile p");
@@ -353,7 +354,6 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "loginTecnico.html";
     });
   }
-
   
   // Modal de agenda
   const agendaBtn = document.getElementById("agendaBtn");
@@ -416,4 +416,63 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("horaEvento").value = "";
   });
 
+  // Abrir modal de admin
+  const adminBtn = document.getElementById("adminBtn");
+  const adminModal = document.getElementById("adminModal");
+  const closeAdmin = adminModal?.querySelector(".close");
+
+  if(adminBtn && adminModal){
+      adminBtn.addEventListener("click", () => {
+          adminModal.style.display = "block";
+      });
+  }
+
+  if(closeAdmin){
+      closeAdmin.addEventListener("click", () => {
+          adminModal.style.display = "none";
+      });
+  }
+
+  // Fechar clicando fora do modal
+  window.addEventListener("click", (e) => {
+      if(e.target === adminModal){
+          adminModal.style.display = "none";
+      }
+  });
+
+  // Admin (senha) 
+  const adminForm = document.getElementById("adminForm");
+  const adminMsg  = document.getElementById("adminMsg"); 
+
+  adminForm.onsubmit = async function(e) {
+  e.preventDefault();
+  const senhaDigitada = document.getElementById("adminPassword").value;
+  const email = localStorage.getItem("tecnicoEmail");
+  
+  try {
+    const resp = await api.post("/tecnico/login", {
+          email: email,
+          senha: senhaDigitada
+    });
+
+    const data = resp.data;
+
+    if (data.administrador) {
+      adminMsg.textContent = "Acesso liberado! Redirecionando...";
+      adminMsg.className = "msg sucesso";
+      adminMsg.style.display = "block";
+      setTimeout(() => window.location.href = "relatorioAdmin.html", 1500);
+    } else {
+      adminMsg.textContent = "Sem permissão!";
+      adminMsg.className = "msg erro";
+      adminMsg.style.display = "block";
+    }
+  } catch (err) {
+    adminMsg.textContent = "Senha incorreta!";
+    adminMsg.className = "msg erro";
+    adminMsg.style.display = "block";
+    console.error(err);
+  }
+  };
+  
 });
