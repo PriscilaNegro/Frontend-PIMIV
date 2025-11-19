@@ -93,7 +93,21 @@
     <div class="modal-content">
       <span class="close">&times;</span>
       <h3>Agenda</h3>
-      <input type="date">
+
+      <!-- Campos simples -->
+      <label for="evento">Título do evento:</label>
+      <input type="text" id="evento" placeholder="Digite o título">
+
+      <label for="dataEvento">Data:</label>
+      <input type="date" id="dataEvento">
+
+      <label for="horaEvento">Hora:</label>
+      <input type="time" id="horaEvento">
+
+      <button id="salvarEvento">Salvar</button>
+
+      <!-- Lista de eventos simples -->
+      <ul id="listaEventos"></ul>
     </div>
   </div>
 

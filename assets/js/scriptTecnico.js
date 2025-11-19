@@ -353,4 +353,67 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = "loginTecnico.html";
     });
   }
+
+  
+  // Modal de agenda
+  const agendaBtn = document.getElementById("agendaBtn");
+  const agendaModal = document.getElementById("agendaModal");
+  const closeAgenda = agendaModal.querySelector(".close");
+  const salvarEventoBtn = document.getElementById("salvarEvento");
+  const listaEventos = document.getElementById("listaEventos");
+
+  // Abrir modal
+  agendaBtn.addEventListener("click", () => {
+    agendaModal.style.display = "block";
+    carregarEventos(); // carrega eventos salvos
+  });
+
+  // Fechar modal
+  closeAgenda.addEventListener("click", () => {
+    agendaModal.style.display = "none";
+  });
+
+  // Fechar clicando fora
+  window.addEventListener("click", (e) => {
+    if (e.target === agendaModal) agendaModal.style.display = "none";
+  });
+
+  // Função para carregar eventos do sessionStorage
+  function carregarEventos() {
+    const eventos = JSON.parse(sessionStorage.getItem("eventosAgenda") || "[]");
+    listaEventos.innerHTML = ""; // limpa lista antes de renderizar
+    eventos.forEach(ev => {
+      const li = document.createElement("li");
+      li.textContent = `${ev.data} ${ev.hora} - ${ev.titulo}`;
+      listaEventos.appendChild(li);
+    });
+  }
+
+// Salvar evento
+  salvarEventoBtn.addEventListener("click", () => {
+    const titulo = document.getElementById("evento").value;
+    const data = document.getElementById("dataEvento").value;
+    const hora = document.getElementById("horaEvento").value;
+
+    if (!titulo || !data || !hora) {
+      alert("Preencha todos os campos!");
+      return;
+    }
+
+    // Cria objeto do evento
+    const novoEvento = { titulo, data, hora };
+
+    // Recupera array atual do sessionStorage e adiciona o novo
+    const eventos = JSON.parse(sessionStorage.getItem("eventosAgenda") || "[]");
+    eventos.push(novoEvento);
+    sessionStorage.setItem("eventosAgenda", JSON.stringify(eventos));
+
+    carregarEventos(); // atualiza lista
+
+    // Limpa campos
+    document.getElementById("evento").value = "";
+    document.getElementById("dataEvento").value = "";
+    document.getElementById("horaEvento").value = "";
+  });
+
 });

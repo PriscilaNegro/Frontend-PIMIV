@@ -220,11 +220,25 @@
   justify-content: center;
 }
 
+.modal .close {
+  float: right;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+.modal input, .modal button {
+  width: 100%;
+  margin: 5px 0;
+  padding: 5px;
+}
+
 .modal-content {
   background: #ffffff;
   padding: 25px 30px;
+  margin: 10%;
   width: 400px;
   max-width: 90%;
+  text-align: left;
   border-radius: 12px;
   box-shadow: 0 6px 15px rgba(0,0,0,0.25);
   position: relative;
