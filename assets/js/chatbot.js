@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function enviarParaBackend(problema) {
     try {
-      const response = await api.post("/chamado", { message: problema });
+      const response = await api.post("/chat", { message: problema });
       return response.data;
     } catch (error) {
       console.error("Erro ao enviar para o backend:", error);

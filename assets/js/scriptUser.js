@@ -128,26 +128,37 @@ if (pagina === "chamado.html") {
   const btnSalvar = document.getElementById("btnSalvar");
 
   if (btnEditar && btnSalvar && solucaoCampo) {
-    btnEditar.addEventListener("click", () => {
-      // Mantém o estilo e apenas troca para textarea preservando o data-solucao-id
-      if (solucaoCampo.tagName !== "TEXTAREA") {
-        const textarea = document.createElement("textarea");
-        textarea.id = "solucao-texto";
-        textarea.className = solucaoCampo.className;
-        textarea.value = solucaoCampo.textContent;
-        textarea.rows = 5;
-        // preserva o id da solução
-        if (solucaoCampo.dataset.solucaoId) {
-          textarea.dataset.solucaoId = solucaoCampo.dataset.solucaoId;
+    btnEditar.addEventListener("click", async () => {
+      // Recarrega os dados antes de editar para garantir versão mais recente
+      try {
+        await carregarChamado();
+        
+        // Após recarregar, pega a referência atualizada
+        solucaoCampo = document.getElementById("solucao-texto");
+        
+        // Mantém o estilo e apenas troca para textarea preservando o data-solucao-id
+        if (solucaoCampo.tagName !== "TEXTAREA") {
+          const textarea = document.createElement("textarea");
+          textarea.id = "solucao-texto";
+          textarea.className = solucaoCampo.className;
+          textarea.value = solucaoCampo.textContent;
+          textarea.rows = 5;
+          // preserva o id da solução
+          if (solucaoCampo.dataset.solucaoId) {
+            textarea.dataset.solucaoId = solucaoCampo.dataset.solucaoId;
+          }
+          solucaoCampo.parentNode.replaceChild(textarea, solucaoCampo);
+          solucaoCampo = textarea;
         }
-        solucaoCampo.parentNode.replaceChild(textarea, solucaoCampo);
-        solucaoCampo = textarea;
-      }
 
-      solucaoCampo.removeAttribute("readonly");
-      solucaoCampo.focus();
-      btnEditar.style.display = "none";
-      btnSalvar.style.display = "inline-block";
+        solucaoCampo.removeAttribute("readonly");
+        solucaoCampo.focus();
+        btnEditar.style.display = "none";
+        btnSalvar.style.display = "inline-block";
+      } catch (error) {
+        console.error("Erro ao recarregar antes de editar:", error);
+        showFeedback("Erro ao carregar dados atualizados.", "erro");
+      }
     });
 
     // Substitui alerts por mensagem discreta abaixo da solução (sem alterar layout / botões)
@@ -209,11 +220,11 @@ if (pagina === "chamado.html") {
         if (idSolucao) {
           // PATCH: id como query param, body é string direta
           console.log(`PATCH /solucao?id=${idSolucao}`);
-          const resp = await api.patch(`/solucao?id=${idSolucao}`,
+          await api.patch(`/solucao?id=${idSolucao}`,
             JSON.stringify(textoSolucao),
             { headers: { 'Content-Type': 'application/json' } }
           );
-          console.log("Resposta PATCH:", resp.data);
+          console.log("Solução atualizada via PATCH");
         } else {
           // POST: mantém objeto { idChamado, descricao }
           console.log("POST /solucao");
@@ -221,35 +232,25 @@ if (pagina === "chamado.html") {
             idChamado: Number(idChamado), 
             descricao: textoSolucao 
           });
-          console.log("Resposta POST:", resp.data);
+          console.log("Solução criada via POST:", resp.data);
           
           idSolucao = resp.data?.id || resp.data?.idSolucao || null;
           console.log("ID criado:", idSolucao);
         }
 
-        // Atualiza estado
-        if (!chamadoAtual.solucao) chamadoAtual.solucao = {};
-        chamadoAtual.solucao.id = idSolucao;
-        chamadoAtual.solucao.descricao = textoSolucao;
+        showFeedback("Salvando...", "ok");
 
-        // Volta para <p>
-        let novoEl = document.getElementById("solucao-texto");
-        if (novoEl.tagName === "TEXTAREA") {
-          const p = document.createElement("p");
-          p.id = "solucao-texto";
-          p.className = novoEl.className;
-          p.textContent = textoSolucao;
-          if (idSolucao) p.dataset.solucaoId = String(idSolucao);
-          novoEl.parentNode.replaceChild(p, novoEl);
-        } else {
-          novoEl.textContent = textoSolucao;
-          if (idSolucao) novoEl.dataset.solucaoId = String(idSolucao);
-        }
-
-        btnSalvar.style.display = "none";
-        btnEditar.style.display = "inline-block";
-        showFeedback("Solução salva com sucesso.", "ok");
+        // Recarrega o chamado para garantir sincronização
+        await carregarChamado();
         
+        // Garante que os botões voltam ao estado inicial
+        const editBtn = document.getElementById("btnEditar");
+        const saveBtn = document.getElementById("btnSalvar");
+        if (saveBtn) saveBtn.style.display = "none";
+        if (editBtn) editBtn.style.display = "inline-block";
+
+        showFeedback("Solução salva com sucesso!", "ok");
+
       } catch (error) {
         console.error("ERRO:", error?.response?.data || error?.message);
         showFeedback(`Erro: ${error?.response?.data?.message || error?.message || 'Falha'}`, "erro");

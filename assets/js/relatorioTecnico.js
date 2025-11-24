@@ -69,20 +69,36 @@ document.addEventListener("DOMContentLoaded", async () => {
       return dt >= ini && dt < fim;
     });
 
+    // Filtra por data de fechamento
+    const dentroPeriodoFechamento = (lista, ini, fim) => lista.filter(c => {
+      if (!c.dataConclusao || c.status !== 2) return false;
+      const dt = new Date(c.dataConclusao);
+      return dt >= ini && dt < fim;
+    });
+
     const hojeLista = dentroPeriodo(meus, hoje, amanha);
-    const mesLista  = dentroPeriodo(meus, inicioMes, amanha);
+
+    // Fechados HOJE por data de fechamento
+    const fechadosHoje = dentroPeriodoFechamento(meus, hoje, amanha).length;
+
+    // MUDANÇA: Em Andamento = todos os chamados atualmente com status 1
+    const totalAndamento = meus.filter(c => c.status === 1).length;
 
     const resumoHoje = {
       abertos:   hojeLista.filter(c => c.status === 0).length,
-      andamento: hojeLista.filter(c => c.status === 1).length,
-      fechados:  hojeLista.filter(c => c.status === 2).length,
+      andamento: totalAndamento, // Total de chamados em andamento agora
+      fechados:  fechadosHoje,
       atrasados: hojeLista.filter(c => c.status === 3).length
     };
 
-    const fechadosMes = mesLista.filter(c => c.status === 2).length;
-    const tempos = mesLista
-      .filter(c => c.status === 2 && c.dataFechamento && c.dataAbertura)
-      .map(c => (new Date(c.dataFechamento) - new Date(c.dataAbertura))/3600000);
+    // Fechados no mês por data de conclusão
+    const fechadosMesLista = dentroPeriodoFechamento(meus, inicioMes, amanha);
+    const fechadosMes = fechadosMesLista.length;
+    
+    // Tempo médio apenas dos chamados fechados no mês
+    const tempos = fechadosMesLista
+      .filter(c => c.dataConclusao && c.dataAbertura)
+      .map(c => (new Date(c.dataConclusao) - new Date(c.dataAbertura))/3600000);
     const tempoMedio = tempos.length
       ? `${(tempos.reduce((a,b)=>a+b,0)/tempos.length).toFixed(1)}h`
       : "0h";
@@ -94,10 +110,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       const dia = new Date(hoje); dia.setDate(dia.getDate() - i);
       const dia2 = new Date(dia); dia2.setDate(dia2.getDate() + 1);
       const diaLista = dentroPeriodo(meus, dia, dia2);
+      
+      // Fechados do dia por data de fechamento
+      const fechadosDia = dentroPeriodoFechamento(meus, dia, dia2).length;
+      
       datas.push(dia.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"}));
       abertos.push(diaLista.filter(c=>c.status===0).length);
-      andamento.push(diaLista.filter(c=>c.status===1).length);
-      fechados.push(diaLista.filter(c=>c.status===2).length);
+      
+      // MUDANÇA: No gráfico, mostra snapshot do total em andamento no dia atual
+      // Como não temos histórico, repetimos o valor atual para todos os dias
+      andamento.push(i === 0 ? totalAndamento : 0); // Só mostra no último dia (hoje)
+      
+      fechados.push(fechadosDia);
       atrasados.push(diaLista.filter(c=>c.status===3).length);
     }
 
