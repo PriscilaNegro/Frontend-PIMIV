@@ -1,6 +1,15 @@
 import { api } from "./api.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
+  
+  // Impede que a página seja exibida pelo cache do navegador após logout
+  window.history.replaceState(null, "", window.location.href);
+  window.onpopstate = function () {
+      if (!sessionStorage.getItem("tecnicoId")) {
+          window.location.replace("loginTecnico.html");
+      }
+  };
+
   // Config: defina true para montar relatório somente com /chamado/tecnico/{id}
   const USE_FRONT_ONLY = true;
 

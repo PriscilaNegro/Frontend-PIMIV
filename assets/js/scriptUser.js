@@ -9,7 +9,7 @@ if (pagina === "index.html") {
   const erro = document.getElementById("erro");
 
   if (form) {
-    form.addEventListener("submit", function(event) {
+    form.addEventListener("submit", async function(event) {
       event.preventDefault();
       const codigo = input.value.trim();
       const regex = /^\d{4,6}$/;
@@ -21,9 +21,27 @@ if (pagina === "index.html") {
       }
 
       erro.style.display = "none";
-      sessionStorage.setItem("chamadoAtivo", codigo);
-      sessionStorage.setItem("usuarioTipo", "cliente");
-      window.location.href = `chamado.html?codigo=${encodeURIComponent(codigo)}`;
+      
+      try {
+        const resp = await api.get(`/chamado/protocolo/${codigo}`);
+
+        if (!resp.data) {
+          erro.textContent = "Chamado não encontrado.";
+          erro.style.display = "block";
+          return;
+        }
+
+        sessionStorage.setItem("chamadoAtivo", codigo);
+        sessionStorage.setItem("usuarioTipo", "cliente");
+
+        window.location.href = `chamado.html?codigo=${encodeURIComponent(codigo)}`;
+
+      } catch (e) {
+        erro.textContent = "Chamado não encontrado. Verifique se o número do protocolo esta correto.";
+        erro.style.display = "block";
+        return;
+      }
+
     });
 
     input.addEventListener("input", function () {

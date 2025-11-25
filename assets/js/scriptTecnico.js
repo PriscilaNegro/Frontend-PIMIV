@@ -1,6 +1,13 @@
 import {api} from "./api.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+  
+  // Impede acesso sem login
+  if (!sessionStorage.getItem("tecnicoId")) {
+    window.location.replace("loginTecnico.html");
+    return;
+  }
+
   // Verifica se é admin
   const isAdmin = sessionStorage.getItem("isAdmin") === "true";
   const tecnicoId = sessionStorage.getItem("tecnicoId");
@@ -319,6 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
     await carregarChamadosBackend();
     aplicarFiltrosLocais();
     renderChamados();
+    calcularTempoMedioPainel(chamadosData);
   }
 
   // Eventos de filtros
@@ -341,17 +349,22 @@ document.addEventListener("DOMContentLoaded", () => {
   carregarTecnicos();
   atualizarLista();
 
-    // Logout
-  const btnSair = document.getElementById("logout") || document.querySelector(".logout") || document.getElementById("logout");
+  // Logout
+  const btnSair = 
+    document.getElementById("logout") || 
+    document.querySelector(".logout");
+
   if (btnSair) {
     btnSair.addEventListener("click", (e) => {
       e.preventDefault();
-      // Limpa dados do session/localStorage
+
+      // Limpando sessão
       sessionStorage.clear();
       localStorage.removeItem("tecnicoNome");
       localStorage.removeItem("tecnicoId");
-      // Redireciona para login
-      window.location.href = "loginTecnico.html";
+
+      // Impede o voltar do navegador
+      window.location.replace("loginTecnico.html");
     });
   }
   
@@ -474,5 +487,23 @@ document.addEventListener("DOMContentLoaded", () => {
     console.error(err);
   }
   };
-  
+
+  function calcularTempoMedioPainel(chamados) {
+    const fechadosMesLista = chamados.filter(c => c.status === 2);
+
+    const tempos = fechadosMesLista
+      .filter(c => c.dataConclusao && c.dataAbertura)
+      .map(c =>
+        (new Date(c.dataConclusao) - new Date(c.dataAbertura)) / 3600000
+      );
+
+    const tempoMedio = tempos.length
+      ? `${(tempos.reduce((a, b) => a + b, 0) / tempos.length).toFixed(1)}h`
+      : "0h";
+
+    // Preenche o painel
+    const tempoEl = document.getElementById("tempoMedioPainel");
+    if (tempoEl) tempoEl.textContent = tempoMedio;
+  }
+
 });
