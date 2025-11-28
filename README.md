@@ -1,7 +1,5 @@
 # 🖥️ Sistema de Gestão de Chamados e Suporte Técnico 4Devs 
 
-## 📄 Visão Geral  
-
 Este repositório contém o Frontend do Sistema de Gestão de Chamados e Suporte Técnico da empresa 4Devs, desenvolvido como projeto do PIM IV.
 A aplicação oferece uma interface moderna, simples e intuitiva para abertura e consulta de chamados, além de painel para técnicos e administradores acompanharem, filtrarem e finalizarem atendimentos.
 
